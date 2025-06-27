@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
 
 public class DialogCustomClickListener extends PacketListenerAbstract {
@@ -22,10 +23,12 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         PacketReceiveEvent cloneEvent = event.clone();
         Object buffer = cloneEvent.getByteBuf();
         byte[] byteArray = ByteBufHelper.copyBytes(buffer);
+        PacketWrapper<?> wrapper = new PacketWrapper<>(cloneEvent);
+        ResourceLocation dialogId = ResourceLocation.read(wrapper);
+        byte[] nbtData = wrapper.readLengthPrefixed(65536, (ew) -> wrapper.readRemainingBytes());
         cloneEvent.cleanUp();
 
         WrapperPlayClientCustomClickAction packet = new WrapperPlayClientCustomClickAction(event);
-        ResourceLocation dialogId = packet.getId();
         NBT data = packet.getPayload();
 
         instance.getLogger().log("Received custom click action for dialog: " + dialogId);
@@ -36,5 +39,11 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
             byteArrayString.append(String.format("%02X ", b));
         }
         instance.getLogger().log(byteArrayString.toString());
+        instance.getLogger().log("NBT Byte Array: ");
+        StringBuilder nbtByteArrayString = new StringBuilder();
+        for (byte b : nbtData) {
+            nbtByteArrayString.append(String.format("%02X ", b));
+        }
+        instance.getLogger().log(nbtByteArrayString.toString());
     }
 }
