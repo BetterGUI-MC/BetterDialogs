@@ -4,10 +4,16 @@ import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTLimiter;
+import com.github.retrooper.packetevents.protocol.nbt.serializer.DefaultNBTSerializer;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
+import me.hsgamer.hscore.logger.common.LogLevel;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 
 public class DialogCustomClickListener extends PacketListenerAbstract {
     private final BetterDialogs instance;
@@ -24,8 +30,15 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         Object buffer = cloneEvent.getByteBuf();
         byte[] byteArray = ByteBufHelper.copyBytes(buffer);
         PacketWrapper<?> wrapper = new PacketWrapper<>(cloneEvent);
-        ResourceLocation dialogId = ResourceLocation.read(wrapper);
+        String dialogId = wrapper.readString();
         byte[] nbtData = wrapper.readLengthPrefixed(65536, (ew) -> wrapper.readRemainingBytes());
+        NBT nbt;
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(nbtData); DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream)) {
+            nbt = DefaultNBTSerializer.INSTANCE.deserializeTag(NBTLimiter.noop(), dataInputStream, false);
+        } catch (Exception e) {
+            instance.getLogger().log(LogLevel.INFO, "Failed to read NBT data from custom click action", e);
+            return;
+        }
         cloneEvent.cleanUp();
 
         WrapperPlayClientCustomClickAction packet = new WrapperPlayClientCustomClickAction(event);
@@ -33,6 +46,7 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
 
         instance.getLogger().log("Received custom click action for dialog: " + dialogId);
         instance.getLogger().log("Data: " + data + " (Type: " + data.getClass().getSimpleName() + ")");
+        instance.getLogger().log("Actual Data: " + nbt + " (Type: " + nbt.getClass().getSimpleName() + ")");
         instance.getLogger().log("Byte Array: ");
         StringBuilder byteArrayString = new StringBuilder();
         for (byte b : byteArray) {
