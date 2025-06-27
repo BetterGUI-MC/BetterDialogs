@@ -17,6 +17,8 @@ import com.github.retrooper.packetevents.protocol.dialog.input.NumberRangeInputC
 import com.github.retrooper.packetevents.protocol.dialog.input.TextInputControl;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.Component;
@@ -100,6 +102,9 @@ public class TestDialog {
                 )
         );
 
+        NBTCompound additions = new NBTCompound();
+        additions.setTag("TestKey", new NBTString("TestValue"));
+
         return new ConfirmationDialog(
                 new CommonDialogData(
                         title,
@@ -118,7 +123,7 @@ public class TestDialog {
                         ),
                         new DynamicCustomAction(
                                 new ResourceLocation("betterdialogs", "confirm_action"),
-                                null
+                                additions
                         )
                 ),
                 new ActionButton(
@@ -129,7 +134,7 @@ public class TestDialog {
                         ),
                         new DynamicCustomAction(
                                 new ResourceLocation("betterdialogs", "cancel_action"),
-                                null
+                                additions
                         )
                 )
         );

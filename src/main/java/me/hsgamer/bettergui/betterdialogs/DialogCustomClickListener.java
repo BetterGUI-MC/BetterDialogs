@@ -2,6 +2,7 @@ package me.hsgamer.bettergui.betterdialogs;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.netty.buffer.ByteBufHelper;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
@@ -18,11 +19,22 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.CUSTOM_CLICK_ACTION) return;
 
+        PacketReceiveEvent cloneEvent = event.clone();
+        Object buffer = cloneEvent.getByteBuf();
+        byte[] byteArray = ByteBufHelper.copyBytes(buffer);
+        cloneEvent.cleanUp();
+
         WrapperPlayClientCustomClickAction packet = new WrapperPlayClientCustomClickAction(event);
         ResourceLocation dialogId = packet.getId();
         NBT data = packet.getPayload();
 
         instance.getLogger().log("Received custom click action for dialog: " + dialogId);
-        instance.getLogger().log("Data: " + data);
+        instance.getLogger().log("Data: " + data + " (Type: " + data.getClass().getSimpleName() + ")");
+        instance.getLogger().log("Byte Array: ");
+        StringBuilder byteArrayString = new StringBuilder();
+        for (byte b : byteArray) {
+            byteArrayString.append(String.format("%02X ", b));
+        }
+        instance.getLogger().log(byteArrayString.toString());
     }
 }
