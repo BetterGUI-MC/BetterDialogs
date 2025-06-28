@@ -6,6 +6,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSh
 import io.github.projectunified.minelib.plugin.command.CommandComponent;
 import me.hsgamer.bettergui.api.addon.GetLogger;
 import me.hsgamer.bettergui.api.addon.GetPlugin;
+import me.hsgamer.bettergui.betterdialogs.listener.DialogCustomClickListener;
 import me.hsgamer.hscore.expansion.common.Expansion;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
