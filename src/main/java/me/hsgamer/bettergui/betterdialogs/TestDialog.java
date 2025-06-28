@@ -17,8 +17,6 @@ import com.github.retrooper.packetevents.protocol.dialog.input.NumberRangeInputC
 import com.github.retrooper.packetevents.protocol.dialog.input.TextInputControl;
 import com.github.retrooper.packetevents.protocol.item.ItemStack;
 import com.github.retrooper.packetevents.protocol.item.type.ItemTypes;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.Component;
@@ -27,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TestDialog {
-    public static ConfirmationDialog createTestDialog() {
+    public static ConfirmationDialog createTestDialog(boolean withInputs) {
         Component title = Component.text("Test Dialog");
         Component externalTitle = Component.text("External Title");
         List<DialogBody> dialogBodies = new ArrayList<>();
@@ -72,38 +70,37 @@ public class TestDialog {
         ));
 
         List<Input> dialogInputs = new ArrayList<>();
-        dialogInputs.add(
-                new Input(
-                        "input1",
-                        new TextInputControl(
-                                100,
-                                LegacyComponentSerializer.legacyAmpersand().deserialize("Enter your name:"),
-                                true,
-                                "Test User",
-                                200,
-                                new TextInputControl.MultilineOptions(1, 10)
-                        )
-                )
-        );
-        dialogInputs.add(
-                new Input(
-                        "input2",
-                        new NumberRangeInputControl(
-                                50,
-                                LegacyComponentSerializer.legacyAmpersand().deserialize("Enter a number between 1 and 100:"),
-                                "options.generic_value",
-                                new NumberRangeInputControl.RangeInfo(
-                                        1,
-                                        100,
-                                        1F,
-                                        1F
-                                )
-                        )
-                )
-        );
-
-        NBTCompound additions = new NBTCompound();
-        additions.setTag("TestKey", new NBTString("TestValue"));
+        if (withInputs) {
+            dialogInputs.add(
+                    new Input(
+                            "input1",
+                            new TextInputControl(
+                                    100,
+                                    LegacyComponentSerializer.legacyAmpersand().deserialize("Enter your name:"),
+                                    true,
+                                    "Test User",
+                                    200,
+                                    new TextInputControl.MultilineOptions(1, 10)
+                            )
+                    )
+            );
+            dialogInputs.add(
+                    new Input(
+                            "input2",
+                            new NumberRangeInputControl(
+                                    50,
+                                    LegacyComponentSerializer.legacyAmpersand().deserialize("Enter a number between 1 and 100:"),
+                                    "options.generic_value",
+                                    new NumberRangeInputControl.RangeInfo(
+                                            1,
+                                            100,
+                                            1F,
+                                            1F
+                                    )
+                            )
+                    )
+            );
+        }
 
         return new ConfirmationDialog(
                 new CommonDialogData(
@@ -123,7 +120,7 @@ public class TestDialog {
                         ),
                         new DynamicCustomAction(
                                 new ResourceLocation("betterdialogs", "confirm_action"),
-                                additions
+                                null
                         )
                 ),
                 new ActionButton(
@@ -134,7 +131,7 @@ public class TestDialog {
                         ),
                         new DynamicCustomAction(
                                 new ResourceLocation("betterdialogs", "cancel_action"),
-                                additions
+                                null
                         )
                 )
         );

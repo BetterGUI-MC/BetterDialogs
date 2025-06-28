@@ -20,7 +20,8 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin {
             @Override
             public boolean execute(CommandSender commandSender, String s, String[] strings) {
                 if (commandSender instanceof Player player) {
-                    ConfirmationDialog dialog = TestDialog.createTestDialog();
+                    boolean withInputs = strings.length > 0 && Boolean.parseBoolean(strings[0]);
+                    ConfirmationDialog dialog = TestDialog.createTestDialog(withInputs);
                     WrapperPlayServerShowDialog packet = new WrapperPlayServerShowDialog(dialog);
                     PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
                 }
