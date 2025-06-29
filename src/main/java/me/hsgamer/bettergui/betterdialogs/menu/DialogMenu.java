@@ -10,8 +10,8 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerCl
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
 import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
-import me.hsgamer.bettergui.betterdialogs.builder.DialogMenuComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.component.DialogMenuComponent;
+import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
 import me.hsgamer.bettergui.menu.BaseMenu;
@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 public class DialogMenu extends BaseMenu {
     private final BetterDialogs instance;
     private final Supplier<DialogConstructor> dialogConstructorSupplier;
-    private final Map<String, DialogMenuComponent> componentMap = new LinkedHashMap<>();
+    private final Map<String, DialogComponent> componentMap = new LinkedHashMap<>();
 
     private final String title;
     private final @Nullable String externalTitle;
@@ -74,8 +74,8 @@ public class DialogMenu extends BaseMenu {
             String key = configEntry.getKey();
             MapUtils.castOptionalStringObjectMap(configEntry.getValue())
                     .map(CaseInsensitiveStringMap::new)
-                    .map(map -> new DialogMenuComponentBuilder.Input(this, key, map))
-                    .flatMap(DialogMenuComponentBuilder.INSTANCE::build)
+                    .map(map -> new DialogComponentBuilder.Input(this, key, map))
+                    .flatMap(DialogComponentBuilder.INSTANCE::build)
                     .ifPresent(customFormComponent -> componentMap.put(key, customFormComponent));
         }
 
@@ -100,7 +100,7 @@ public class DialogMenu extends BaseMenu {
                 .pause(pause)
                 .afterAction(afterAction);
 
-        for (DialogMenuComponent component : componentMap.values()) {
+        for (DialogComponent component : componentMap.values()) {
             component.apply(player, dialogDataConstructor, dialogConstructor);
         }
 

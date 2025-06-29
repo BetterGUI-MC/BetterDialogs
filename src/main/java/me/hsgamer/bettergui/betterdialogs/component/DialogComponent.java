@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public abstract class DialogMenuComponent implements MenuElement {
+public abstract class DialogComponent implements MenuElement {
     private final String name;
     private final DialogMenu menu;
 
-    protected DialogMenuComponent(String name, DialogMenu menu) {
+    protected DialogComponent(String name, DialogMenu menu) {
         this.name = name;
         this.menu = menu;
     }

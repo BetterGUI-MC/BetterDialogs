@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.builder;
 
-import me.hsgamer.bettergui.betterdialogs.component.DialogMenuComponent;
+import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
@@ -8,10 +8,10 @@ import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class DialogMenuComponentBuilder extends FunctionalMassBuilder<DialogMenuComponentBuilder.Input, DialogMenuComponent> {
-    public static final DialogMenuComponentBuilder INSTANCE = new DialogMenuComponentBuilder();
+public class DialogComponentBuilder extends FunctionalMassBuilder<DialogComponentBuilder.Input, DialogComponent> {
+    public static final DialogComponentBuilder INSTANCE = new DialogComponentBuilder();
 
-    private DialogMenuComponentBuilder() {
+    private DialogComponentBuilder() {
 
     }
 
