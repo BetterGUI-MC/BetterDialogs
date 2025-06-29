@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
+import com.github.retrooper.packetevents.wrapper.play.client.WrapperPlayClientCustomClickAction;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.CUSTOM_CLICK_ACTION) return;
 
-        FixedWrapperPlayClientCustomClickAction packet = new FixedWrapperPlayClientCustomClickAction(event);
+        WrapperPlayClientCustomClickAction packet = new WrapperPlayClientCustomClickAction(event);
         ResourceLocation namespacedId = packet.getId();
         NBT data = packet.getPayload();
 
