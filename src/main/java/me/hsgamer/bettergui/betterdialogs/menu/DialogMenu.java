@@ -5,6 +5,7 @@ import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
 import com.github.retrooper.packetevents.protocol.dialog.Dialog;
 import com.github.retrooper.packetevents.protocol.dialog.DialogAction;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
@@ -12,6 +13,7 @@ import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyCompon
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
+import me.hsgamer.bettergui.betterdialogs.component.input.InputComponent;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
 import me.hsgamer.bettergui.menu.BaseMenu;
@@ -26,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class DialogMenu extends BaseMenu {
@@ -84,6 +86,8 @@ public class DialogMenu extends BaseMenu {
             String component = split[0];
             String key = split.length > 1 ? split[1] : "";
             return Optional.ofNullable(componentMap.get(component))
+                    .filter(InputComponent.class::isInstance)
+                    .map(InputComponent.class::cast)
                     .map(provider -> provider.getValue(uuid, key))
                     .orElse(null);
         }));
@@ -108,8 +112,20 @@ public class DialogMenu extends BaseMenu {
         return dialogConstructor.construct(dialogData);
     }
 
-    public ResourceLocation registerAction(String actionName, BiConsumer<Player, NBT> action) {
-        return instance.dialogCustomClickListener().registerAction(getName() + "_" + actionName, action);
+    private void applyInputs(Player player, NBT nbt) {
+        if (!(nbt instanceof NBTCompound nbtCompound)) return;
+        for (DialogComponent component : componentMap.values()) {
+            if (component instanceof InputComponent<?> inputComponent) {
+                inputComponent.applyValue(player.getUniqueId(), nbtCompound);
+            }
+        }
+    }
+
+    public ResourceLocation registerAction(String actionName, Consumer<Player> action) {
+        return instance.dialogCustomClickListener().registerAction(getName() + "_" + actionName, (player, nbt) -> {
+            applyInputs(player, nbt);
+            action.accept(player);
+        });
     }
 
     @Override

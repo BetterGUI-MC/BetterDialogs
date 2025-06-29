@@ -3,6 +3,7 @@ package me.hsgamer.bettergui.betterdialogs.builder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.ItemComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
+import me.hsgamer.bettergui.betterdialogs.component.input.TextInputComponent;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
@@ -16,6 +17,8 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
     private DialogComponentBuilder() {
         register(TextComponent::new, "plain-message", "message", "plain", "text");
         register(ItemComponent::new, "item");
+
+        register(TextInputComponent::new, "text-input", "input");
     }
 
     @Override
