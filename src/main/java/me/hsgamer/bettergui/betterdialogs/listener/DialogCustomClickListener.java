@@ -2,9 +2,11 @@ package me.hsgamer.bettergui.betterdialogs.listener;
 
 import com.github.retrooper.packetevents.event.PacketListenerAbstract;
 import com.github.retrooper.packetevents.event.PacketReceiveEvent;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
+import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -46,5 +48,19 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
 
         Player player = event.getPlayer();
         action.accept(player, data);
+    }
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        if (event.getPacketType() != PacketType.Play.Server.SHOW_DIALOG) return;
+
+        PacketSendEvent clonedEvent = event.clone();
+        PacketWrapper<?> wrapper = new PacketWrapper<>(clonedEvent);
+        int id = wrapper.readVarInt();
+        NBT dialogNBT = wrapper.readNBTRaw();
+        clonedEvent.cleanUp();
+
+        System.out.println("Dialog ID: " + id);
+        System.out.println("Dialog NBT: " + dialogNBT);
     }
 }
