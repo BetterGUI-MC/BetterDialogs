@@ -1,8 +1,9 @@
-package me.hsgamer.bettergui.betterdialogs.menu;
+package me.hsgamer.bettergui.betterdialogs.component;
 
 import me.hsgamer.bettergui.api.menu.MenuElement;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
+import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
