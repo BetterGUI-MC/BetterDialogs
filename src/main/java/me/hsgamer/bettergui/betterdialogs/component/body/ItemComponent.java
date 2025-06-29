@@ -47,13 +47,13 @@ public class ItemComponent extends DialogBodyComponent {
                 .flatMap(Validate::getNumber)
                 .map(Number::intValue)
                 .filter(width -> width > 0)
-                .orElse(150);
+                .orElse(16);
         height = Optional.ofNullable(input.options().get("height"))
                 .map(Object::toString)
                 .flatMap(Validate::getNumber)
                 .map(Number::intValue)
                 .filter(width -> width > 0)
-                .orElse(150);
+                .orElse(16);
     }
 
     @Override
