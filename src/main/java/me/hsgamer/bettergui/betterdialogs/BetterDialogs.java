@@ -16,7 +16,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
     @Override
     public void onEnable() {
         PacketEvents.getAPI().getEventManager().registerListener(dialogCustomClickListener);
-        MenuBuilder.INSTANCE.register(config -> new DialogMenu(this, config, ConfirmationDialogConstructor::create), "confirmation-dialog");
+        MenuBuilder.INSTANCE.register(config -> new DialogMenu(this, config, ConfirmationDialogConstructor::create), "confirmation-dialog", "confirm-dialog");
     }
 
     @Override
