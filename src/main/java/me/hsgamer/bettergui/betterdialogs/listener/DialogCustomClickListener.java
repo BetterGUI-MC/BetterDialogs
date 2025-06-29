@@ -10,6 +10,7 @@ import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -19,12 +20,14 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
     private final Map<String, BiConsumer<Player, NBT>> actions = new HashMap<>();
 
     private static String normalizeActionName(String actionName) {
-        return actionName.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase();
+        return actionName.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase(Locale.ROOT);
     }
 
     public ResourceLocation registerAction(String actionName, BiConsumer<Player, NBT> action) {
         actionName = normalizeActionName(actionName);
         actions.put(actionName, action);
+        ResourceLocation resourceLocation = new ResourceLocation(NAMESPACE, actionName);
+        System.out.println("Registered custom click action: " + resourceLocation);
         return new ResourceLocation(NAMESPACE, actionName);
     }
 
@@ -39,6 +42,9 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         FixedWrapperPlayClientCustomClickAction packet = new FixedWrapperPlayClientCustomClickAction(event);
         ResourceLocation namespacedId = packet.getId();
         NBT data = packet.getPayload();
+
+        System.out.println("Custom Click Action ID: " + namespacedId);
+        System.out.println("Custom Click Action Data: " + data);
 
         if (!namespacedId.getNamespace().equals(NAMESPACE)) return;
         String actionName = namespacedId.getKey();
