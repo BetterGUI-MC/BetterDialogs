@@ -68,7 +68,7 @@ public class DialogMenu extends BaseMenu {
                         return null;
                     }
                 })
-                .orElse(DialogAction.NONE);
+                .orElse(DialogAction.CLOSE);
 
         for (Map.Entry<String, Object> configEntry : configSettings.entrySet()) {
             String key = configEntry.getKey();
