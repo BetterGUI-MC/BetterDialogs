@@ -3,20 +3,24 @@ package me.hsgamer.bettergui.betterdialogs.menu;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
 import com.github.retrooper.packetevents.protocol.dialog.Dialog;
+import com.github.retrooper.packetevents.protocol.dialog.DialogAction;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
+import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogMenuComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
 import me.hsgamer.bettergui.menu.BaseMenu;
+import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.StringReplacer;
 import me.hsgamer.hscore.config.Config;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,10 +33,41 @@ public class DialogMenu extends BaseMenu {
     private final Supplier<DialogConstructor> dialogConstructorSupplier;
     private final Map<String, DialogMenuComponent> componentMap = new LinkedHashMap<>();
 
+    private final String title;
+    private final @Nullable String externalTitle;
+    private final boolean canCloseWithEscape;
+    private final boolean pause;
+    private final DialogAction afterAction;
+
     public DialogMenu(BetterDialogs instance, Config config, Supplier<DialogConstructor> dialogConstructorSupplier) {
         super(config);
         this.instance = instance;
         this.dialogConstructorSupplier = dialogConstructorSupplier;
+
+        title = Optional.ofNullable(menuSettings.get("title"))
+                .map(Object::toString)
+                .orElse("Dialog Menu");
+        externalTitle = Optional.ofNullable(menuSettings.get("external-title"))
+                .map(Object::toString)
+                .orElse(null);
+        canCloseWithEscape = Optional.ofNullable(menuSettings.get("can-close-with-escape"))
+                .map(Object::toString)
+                .map(Boolean::parseBoolean)
+                .orElse(true);
+        pause = Optional.ofNullable(menuSettings.get("pause"))
+                .map(Object::toString)
+                .map(Boolean::parseBoolean)
+                .orElse(false);
+        afterAction = Optional.ofNullable(menuSettings.get("after-action"))
+                .map(Object::toString)
+                .map(s -> {
+                    try {
+                        return DialogAction.valueOf(s.toUpperCase());
+                    } catch (Exception e) {
+                        return null;
+                    }
+                })
+                .orElse(DialogAction.NONE);
 
         for (Map.Entry<String, Object> configEntry : configSettings.entrySet()) {
             String key = configEntry.getKey();
@@ -56,6 +91,13 @@ public class DialogMenu extends BaseMenu {
     public Dialog createDialog(Player player) {
         DialogDataConstructor dialogDataConstructor = DialogDataConstructor.create();
         DialogConstructor dialogConstructor = dialogConstructorSupplier.get();
+
+        dialogDataConstructor
+                .title(LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
+                .externalTitle(externalTitle != null ? LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this)) : null)
+                .canCloseWithEscape(canCloseWithEscape)
+                .pause(pause)
+                .afterAction(afterAction);
 
         for (DialogMenuComponent component : componentMap.values()) {
             component.apply(player, dialogDataConstructor, dialogConstructor);
