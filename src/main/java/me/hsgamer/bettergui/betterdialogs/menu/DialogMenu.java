@@ -81,7 +81,7 @@ public class DialogMenu extends BaseMenu {
                     .ifPresent(customFormComponent -> componentMap.put(key, customFormComponent));
         }
 
-        variableManager.register("form_", StringReplacer.of((original, uuid) -> {
+        variableManager.register("dialog_", StringReplacer.of((original, uuid) -> {
             String[] split = original.split(":", 2);
             String component = split[0];
             String key = split.length > 1 ? split[1] : "";
