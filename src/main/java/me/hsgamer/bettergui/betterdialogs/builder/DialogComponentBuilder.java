@@ -3,6 +3,7 @@ package me.hsgamer.bettergui.betterdialogs.builder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.ItemComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
+import me.hsgamer.bettergui.betterdialogs.component.button.ConfirmationButtonComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.TextInputComponent;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;
@@ -19,6 +20,8 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
         register(ItemComponent::new, "item");
 
         register(TextInputComponent::new, "text-input", "input");
+        register(input -> new ConfirmationButtonComponent(input, true), "yes-button", "yes");
+        register(input -> new ConfirmationButtonComponent(input, false), "no-button", "no");
     }
 
     @Override
