@@ -1,7 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.builder;
 
-import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.bettergui.betterdialogs.component.DialogMenuComponent;
+import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
 
