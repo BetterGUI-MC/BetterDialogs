@@ -21,6 +21,6 @@ public class DialogMenuComponentBuilder extends FunctionalMassBuilder<DialogMenu
         return Objects.toString(keys.get("type"), "");
     }
 
-    public record Input(String name, DialogMenu menu, Map<String, Object> options) {
+    public record Input(DialogMenu menu, String name, Map<String, Object> options) {
     }
 }

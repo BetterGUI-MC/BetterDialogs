@@ -5,13 +5,29 @@ import com.github.retrooper.packetevents.event.PacketReceiveEvent;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
-import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
+import org.bukkit.entity.Player;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class DialogCustomClickListener extends PacketListenerAbstract {
-    private final BetterDialogs instance;
+    private static final String NAMESPACE = "betterdialogs";
 
-    public DialogCustomClickListener(BetterDialogs instance) {
-        this.instance = instance;
+    private final Map<String, BiConsumer<Player, NBT>> actions = new HashMap<>();
+
+    private static String normalizeActionName(String actionName) {
+        return actionName.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase();
+    }
+
+    public ResourceLocation registerAction(String actionName, BiConsumer<Player, NBT> action) {
+        actionName = normalizeActionName(actionName);
+        actions.put(actionName, action);
+        return new ResourceLocation(NAMESPACE, actionName);
+    }
+
+    public void clearActions() {
+        actions.clear();
     }
 
     @Override
@@ -19,10 +35,16 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         if (event.getPacketType() != PacketType.Play.Client.CUSTOM_CLICK_ACTION) return;
 
         FixedWrapperPlayClientCustomClickAction packet = new FixedWrapperPlayClientCustomClickAction(event);
-        ResourceLocation dialogId = packet.getId();
+        ResourceLocation namespacedId = packet.getId();
         NBT data = packet.getPayload();
 
-        instance.getLogger().log("Received custom click action for dialog: " + dialogId);
-        instance.getLogger().log("Data: " + data + " (Type: " + data.getClass().getSimpleName() + ")");
+        if (!namespacedId.getNamespace().equals(NAMESPACE)) return;
+        String actionName = namespacedId.getKey();
+
+        BiConsumer<Player, NBT> action = actions.get(actionName);
+        if (action == null) return;
+
+        Player player = event.getPlayer();
+        action.accept(player, data);
     }
 }
