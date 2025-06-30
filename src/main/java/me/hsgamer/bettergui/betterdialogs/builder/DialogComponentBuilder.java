@@ -21,6 +21,8 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
         register(ItemComponent::new, "item");
 
         register(TextInputComponent::new, "text-input", "input");
+        register(BooleanInputComponent::new, "boolean-input", "boolean", "toggle", "checkbox", "switch");
+
         register(input -> new ConfirmationButtonComponent(input, true), "yes-button", "yes");
         register(input -> new ConfirmationButtonComponent(input, false), "no-button", "no");
     }
