@@ -45,7 +45,7 @@ public class SingleOptionInputComponent extends InputComponent<String> {
                         (a, b) -> a, // In case of duplicate keys, keep the first one
                         HashMap::new
                 ));
-        defaultValue = Optional.ofNullable(input.options().get("default"))
+        defaultValue = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse(null);
     }
