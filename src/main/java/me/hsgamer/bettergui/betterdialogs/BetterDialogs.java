@@ -11,7 +11,7 @@ import me.hsgamer.bettergui.builder.MenuBuilder;
 import me.hsgamer.hscore.expansion.common.Expansion;
 
 public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Reloadable {
-    private final DialogCustomClickListener dialogCustomClickListener = new DialogCustomClickListener();
+    private final DialogCustomClickListener dialogCustomClickListener = new DialogCustomClickListener(this);
 
     @Override
     public void onEnable() {
