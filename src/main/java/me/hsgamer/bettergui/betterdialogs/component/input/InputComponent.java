@@ -32,7 +32,7 @@ public abstract class InputComponent<T> extends DialogComponent {
 
     protected abstract String getValue(T value, UUID uuid, String args);
 
-    protected abstract T getValue(NBT nbt);
+    protected abstract T getValue(UUID uuid, NBT nbt);
 
     public String getValue(UUID uuid, String args) {
         T value = values.get(uuid);
@@ -45,7 +45,7 @@ public abstract class InputComponent<T> extends DialogComponent {
     public void applyValue(UUID uuid, NBTCompound nbtCompound) {
         NBT nbt = nbtCompound.getTagOrNull(key);
         if (nbt != null) {
-            T value = getValue(nbt);
+            T value = getValue(uuid, nbt);
             if (value != null) {
                 values.put(uuid, value);
                 return;

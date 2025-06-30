@@ -91,7 +91,7 @@ public class NumberInputComponent extends InputComponent<Number> {
     }
 
     @Override
-    protected Number getValue(NBT nbt) {
+    protected Number getValue(UUID uuid, NBT nbt) {
         return switch (nbt) {
             case NBTNumber nbtNumber -> nbtNumber.getAsNumber();
             case NBTString nbtString -> Validate.getNumber(nbtString.getValue()).orElse(null);

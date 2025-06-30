@@ -3,6 +3,7 @@ package me.hsgamer.bettergui.betterdialogs.component.input;
 import com.github.retrooper.packetevents.protocol.dialog.input.BooleanInputControl;
 import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
+import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
@@ -52,7 +53,11 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(NBT nbt) {
-        return nbt instanceof NBTString nbtString ? nbtString.getValue() : null;
+    protected String getValue(UUID uuid, NBT nbt) {
+        return switch (nbt) {
+            case NBTString nbtString -> nbtString.getValue();
+            case NBTByte nbtByte -> StringReplacerApplier.replace(nbtByte.getAsBool() ? onTrue : onFalse, uuid, this);
+            default -> null;
+        };
     }
 }

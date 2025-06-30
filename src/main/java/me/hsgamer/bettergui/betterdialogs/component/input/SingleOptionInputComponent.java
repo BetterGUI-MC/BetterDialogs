@@ -91,7 +91,7 @@ public class SingleOptionInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(NBT nbt) {
+    protected String getValue(UUID uuid, NBT nbt) {
         return nbt instanceof NBTString nbtString ? nbtString.getValue() : null;
     }
 }
