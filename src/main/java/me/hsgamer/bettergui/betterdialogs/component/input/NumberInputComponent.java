@@ -46,7 +46,7 @@ public class NumberInputComponent extends InputComponent<Number> {
                 .orElse("100");
         initial = Optional.ofNullable(input.options().get("initial"))
                 .map(Object::toString)
-                .orElse("0");
+                .orElse(start);
         step = Optional.ofNullable(input.options().get("step"))
                 .map(Object::toString)
                 .orElse("1");
