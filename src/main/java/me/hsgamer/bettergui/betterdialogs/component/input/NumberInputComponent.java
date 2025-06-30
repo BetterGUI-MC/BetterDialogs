@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.Optional;
+import java.util.UUID;
 
 public class NumberInputComponent extends InputComponent<Number> {
     private final int width;
@@ -75,7 +76,7 @@ public class NumberInputComponent extends InputComponent<Number> {
     }
 
     @Override
-    protected String getValue(Number value, String args) {
+    protected String getValue(Number value, UUID uuid, String args) {
         if (args.isEmpty()) {
             return String.valueOf(value);
         } else {

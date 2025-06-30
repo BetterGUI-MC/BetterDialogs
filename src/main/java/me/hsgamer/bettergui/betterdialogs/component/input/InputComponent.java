@@ -30,7 +30,7 @@ public abstract class InputComponent<T> extends DialogComponent {
 
     protected abstract InputControl createControl(Player player);
 
-    protected abstract String getValue(T value, String args);
+    protected abstract String getValue(T value, UUID uuid, String args);
 
     protected abstract T getValue(NBT nbt);
 
@@ -39,7 +39,7 @@ public abstract class InputComponent<T> extends DialogComponent {
         if (value == null) {
             return "";
         }
-        return getValue(value, args);
+        return getValue(value, uuid, args);
     }
 
     public void applyValue(UUID uuid, NBTCompound nbtCompound) {

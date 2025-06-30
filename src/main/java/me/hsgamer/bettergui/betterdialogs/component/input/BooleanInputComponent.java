@@ -10,6 +10,7 @@ import me.hsgamer.bettergui.util.StringReplacerApplier;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class BooleanInputComponent extends InputComponent<String> {
     private final String label;
@@ -45,7 +46,7 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(String value, String args) {
+    protected String getValue(String value, UUID uuid, String args) {
         return value;
     }
 

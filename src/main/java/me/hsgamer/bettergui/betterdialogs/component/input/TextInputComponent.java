@@ -11,6 +11,7 @@ import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public class TextInputComponent extends InputComponent<String> {
     private final int width;
@@ -76,7 +77,7 @@ public class TextInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(String value, String args) {
+    protected String getValue(String value, UUID uuid, String args) {
         return value;
     }
 
