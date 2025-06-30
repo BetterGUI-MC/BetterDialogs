@@ -6,6 +6,7 @@ import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
 import me.hsgamer.bettergui.betterdialogs.component.button.ConfirmationButtonComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.BooleanInputComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.NumberInputComponent;
+import me.hsgamer.bettergui.betterdialogs.component.input.SingleOptionInputComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.TextInputComponent;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;
@@ -24,6 +25,7 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
         register(TextInputComponent::new, "text-input", "input");
         register(BooleanInputComponent::new, "boolean-input", "boolean", "toggle", "checkbox", "switch");
         register(NumberInputComponent::new, "number-input", "number", "range", "slider");
+        register(SingleOptionInputComponent::new, "single-option-input", "select", "combobox", "radio");
 
         register(input -> new ConfirmationButtonComponent(input, true), "yes-button", "yes");
         register(input -> new ConfirmationButtonComponent(input, false), "no-button", "no");
