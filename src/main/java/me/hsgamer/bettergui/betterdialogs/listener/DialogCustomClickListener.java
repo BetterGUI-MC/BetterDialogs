@@ -49,8 +49,8 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         ResourceLocation namespacedId = packet.getId();
         NBT data = packet.getPayload();
 
-        instance.getLogger().log(LogLevel.DEBUG, "Custom Click Action ID: " + namespacedId);
-        instance.getLogger().log(LogLevel.DEBUG, "Custom Click Action Data: " + data);
+        instance.getLogger().log(LogLevel.INFO, "Custom Click Action ID: " + namespacedId);
+        instance.getLogger().log(LogLevel.INFO, "Custom Click Action Data: " + data);
 
         if (!namespacedId.getNamespace().equals(NAMESPACE)) return;
         String actionName = namespacedId.getKey();
@@ -72,7 +72,7 @@ public class DialogCustomClickListener extends PacketListenerAbstract {
         NBT dialogNBT = wrapper.readNBTRaw();
         clonedEvent.cleanUp();
 
-        instance.getLogger().log(LogLevel.DEBUG, "Dialog ID: " + id);
-        instance.getLogger().log(LogLevel.DEBUG, "Dialog NBT: " + dialogNBT);
+        instance.getLogger().log(LogLevel.INFO, "Dialog ID: " + id);
+        instance.getLogger().log(LogLevel.INFO, "Dialog NBT: " + dialogNBT);
     }
 }
