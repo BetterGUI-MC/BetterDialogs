@@ -22,7 +22,7 @@ public class BooleanInputComponent extends InputComponent<String> {
 
         label = Optional.ofNullable(input.options().get("label"))
                 .map(Object::toString)
-                .orElse("");
+                .orElse("Boolean Input");
         initial = Optional.ofNullable(input.options().get("initial"))
                 .map(Object::toString)
                 .orElse("");
