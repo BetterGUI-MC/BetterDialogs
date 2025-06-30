@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
+import me.hsgamer.hscore.common.MapUtils;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
@@ -24,7 +25,7 @@ public class BooleanInputComponent extends InputComponent<String> {
         label = Optional.ofNullable(input.options().get("label"))
                 .map(Object::toString)
                 .orElse("Boolean Input");
-        initial = Optional.ofNullable(input.options().get("initial"))
+        initial = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse("");
         onTrue = Optional.ofNullable(input.options().get("on-true"))

@@ -7,6 +7,7 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTString;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
+import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
 
@@ -38,7 +39,7 @@ public class TextInputComponent extends InputComponent<String> {
                 .map(Object::toString)
                 .map(Boolean::parseBoolean)
                 .orElse(true);
-        initial = Optional.ofNullable(input.options().get("initial"))
+        initial = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse("");
         maxLength = Optional.ofNullable(input.options().get("max-length"))
