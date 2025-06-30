@@ -2,8 +2,8 @@ package me.hsgamer.bettergui.betterdialogs.component.body;
 
 import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessage;
 import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessageDialogBody;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
@@ -31,7 +31,7 @@ public class TextComponent extends DialogBodyComponent {
 
     public PlainMessage createMessage(Player player) {
         return new PlainMessage(
-                LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(text, player.getUniqueId(), this)),
+                ComponentUtils.convertLegacy(StringReplacerApplier.replace(text, player.getUniqueId(), this)),
                 width
         );
     }

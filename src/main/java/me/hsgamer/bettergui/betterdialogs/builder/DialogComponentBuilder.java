@@ -4,6 +4,7 @@ import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.ItemComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
 import me.hsgamer.bettergui.betterdialogs.component.button.ConfirmationButtonComponent;
+import me.hsgamer.bettergui.betterdialogs.component.input.BooleanInputComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.TextInputComponent;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.hscore.builder.FunctionalMassBuilder;

@@ -3,7 +3,6 @@ package me.hsgamer.bettergui.betterdialogs.component.button;
 import com.github.retrooper.packetevents.protocol.dialog.action.Action;
 import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
 import com.github.retrooper.packetevents.protocol.dialog.button.CommonButtonData;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.builder.ActionComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
@@ -11,6 +10,7 @@ import me.hsgamer.bettergui.betterdialogs.component.action.ActionComponent;
 import me.hsgamer.bettergui.betterdialogs.constructor.ButtonDataConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
+import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
@@ -48,8 +48,8 @@ public abstract class ButtonComponent extends DialogComponent {
     @Override
     public void apply(Player player, DialogDataConstructor dialogDataConstructor, DialogConstructor dialogConstructor) {
         CommonButtonData buttonData = ButtonDataConstructor.create()
-                .label(LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(label, player.getUniqueId(), this)))
-                .tooltip(tooltip == null ? null : LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(tooltip, player.getUniqueId(), this)))
+                .label(ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)))
+                .tooltip(tooltip == null ? null : ComponentUtils.convertLegacy(StringReplacerApplier.replace(tooltip, player.getUniqueId(), this)))
                 .width(width)
                 .construct();
         Action action = actionComponent == null ? null : actionComponent.getAction(player);

@@ -9,13 +9,13 @@ import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.InputComponent;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
+import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.menu.BaseMenu;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
@@ -98,8 +98,8 @@ public class DialogMenu extends BaseMenu {
         DialogConstructor dialogConstructor = dialogConstructorSupplier.get();
 
         dialogDataConstructor
-                .title(LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
-                .externalTitle(externalTitle != null ? LegacyComponentSerializer.legacySection().deserialize(StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this)) : null)
+                .title(ComponentUtils.convertLegacy(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
+                .externalTitle(externalTitle != null ? ComponentUtils.convertLegacy(StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this)) : null)
                 .canCloseWithEscape(canCloseWithEscape)
                 .pause(pause)
                 .afterAction(afterAction);

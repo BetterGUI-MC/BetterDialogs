@@ -4,8 +4,8 @@ import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
 import com.github.retrooper.packetevents.protocol.dialog.input.TextInputControl;
 import com.github.retrooper.packetevents.protocol.nbt.NBT;
 import com.github.retrooper.packetevents.protocol.nbt.NBTString;
-import io.github.retrooper.packetevents.adventure.serializer.legacy.LegacyComponentSerializer;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
@@ -64,7 +64,7 @@ public class TextInputComponent extends InputComponent<String> {
     protected InputControl createControl(Player player) {
         return new TextInputControl(
                 width,
-                LegacyComponentSerializer.legacyAmpersand().deserialize(StringReplacerApplier.replace(label, player.getUniqueId(), this)),
+                ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)),
                 labelVisible,
                 StringReplacerApplier.replace(initial, player.getUniqueId(), this),
                 maxLength,

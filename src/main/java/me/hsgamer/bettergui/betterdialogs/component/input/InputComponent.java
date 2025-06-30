@@ -46,10 +46,12 @@ public abstract class InputComponent<T> extends DialogComponent {
         NBT nbt = nbtCompound.getTagOrNull(key);
         if (nbt != null) {
             T value = getValue(nbt);
-            values.put(uuid, value);
-        } else {
-            values.remove(uuid);
+            if (value != null) {
+                values.put(uuid, value);
+                return;
+            }
         }
+        values.remove(uuid);
     }
 
     @Override
