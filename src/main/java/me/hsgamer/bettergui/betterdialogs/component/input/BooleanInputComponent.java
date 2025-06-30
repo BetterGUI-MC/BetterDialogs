@@ -51,10 +51,6 @@ public class BooleanInputComponent extends InputComponent<String> {
 
     @Override
     protected String getValue(NBT nbt) {
-        if (nbt instanceof NBTString) {
-            return ((NBTString) nbt).getValue();
-        } else {
-            return null;
-        }
+        return nbt instanceof NBTString nbtString ? nbtString.getValue() : null;
     }
 }

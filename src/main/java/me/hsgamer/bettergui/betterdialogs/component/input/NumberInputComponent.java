@@ -90,12 +90,10 @@ public class NumberInputComponent extends InputComponent<Number> {
 
     @Override
     protected Number getValue(NBT nbt) {
-        if (nbt instanceof NBTNumber) {
-            return ((NBTNumber) nbt).getAsNumber();
-        } else if (nbt instanceof NBTString) {
-            return Validate.getNumber(((NBTString) nbt).getValue()).orElse(null);
-        } else {
-            return null;
-        }
+        return switch (nbt) {
+            case NBTNumber nbtNumber -> nbtNumber.getAsNumber();
+            case NBTString nbtString -> Validate.getNumber(nbtString.getValue()).orElse(null);
+            case null, default -> null;
+        };
     }
 }
