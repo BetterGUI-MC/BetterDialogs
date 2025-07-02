@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 public abstract class DialogComponent implements MenuElement {
     private final String name;
-    private final DialogMenu<?> menu;
+    private final DialogMenu menu;
 
     protected DialogComponent(DialogComponentBuilder.Input input) {
         this.name = input.name();
@@ -23,7 +23,7 @@ public abstract class DialogComponent implements MenuElement {
     }
 
     @Override
-    public DialogMenu<?> getMenu() {
+    public DialogMenu getMenu() {
         return menu;
     }
 }

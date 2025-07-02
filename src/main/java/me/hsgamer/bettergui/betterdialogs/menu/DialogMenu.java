@@ -29,11 +29,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
-public class DialogMenu<T extends DialogConstructor> extends BaseMenu {
+public abstract class DialogMenu extends BaseMenu {
     private final BetterDialogs instance;
-    private final Supplier<T> dialogConstructorSupplier;
     private final Map<String, DialogComponent> componentMap = new LinkedHashMap<>();
 
     private final String title;
@@ -42,10 +40,9 @@ public class DialogMenu<T extends DialogConstructor> extends BaseMenu {
     private final boolean pause;
     private final DialogAction afterAction;
 
-    DialogMenu(BetterDialogs instance, Config config, Supplier<T> dialogConstructorSupplier) {
+    DialogMenu(BetterDialogs instance, Config config) {
         super(config);
         this.instance = instance;
-        this.dialogConstructorSupplier = dialogConstructorSupplier;
 
         title = Optional.ofNullable(menuSettings.get("title"))
                 .map(Object::toString)
@@ -93,13 +90,11 @@ public class DialogMenu<T extends DialogConstructor> extends BaseMenu {
         }));
     }
 
-    protected void modifyDialog(Player player, T dialogConstructor) {
-        // This method can be overridden to modify the dialog constructor if needed
-    }
+    protected abstract DialogConstructor createDialogConstructor(Player player);
 
     public Dialog createDialog(Player player) {
         DialogDataConstructor dialogDataConstructor = DialogDataConstructor.create();
-        T dialogConstructor = dialogConstructorSupplier.get();
+        DialogConstructor dialogConstructor = createDialogConstructor(player);
 
         dialogDataConstructor
                 .title(ComponentUtils.convertLegacy(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
@@ -107,7 +102,6 @@ public class DialogMenu<T extends DialogConstructor> extends BaseMenu {
                 .canCloseWithEscape(canCloseWithEscape)
                 .pause(pause)
                 .afterAction(afterAction);
-        modifyDialog(player, dialogConstructor);
 
         for (DialogComponent component : componentMap.values()) {
             component.apply(player, dialogDataConstructor, dialogConstructor);

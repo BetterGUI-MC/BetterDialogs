@@ -1,6 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
+import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.ServerLinksDialogConstructor;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
@@ -9,12 +10,12 @@ import org.bukkit.entity.Player;
 
 import java.util.Optional;
 
-public class ServerLinksDialogMenu extends DialogMenu<ServerLinksDialogConstructor> {
+public class ServerLinksDialogMenu extends DialogMenu {
     private final int columns;
     private final int buttonWidth;
 
     public ServerLinksDialogMenu(BetterDialogs instance, Config config) {
-        super(instance, config, ServerLinksDialogConstructor::create);
+        super(instance, config);
         this.columns = Optional.ofNullable(menuSettings.get("columns"))
                 .map(Object::toString)
                 .flatMap(Validate::getNumber)
@@ -30,7 +31,7 @@ public class ServerLinksDialogMenu extends DialogMenu<ServerLinksDialogConstruct
     }
 
     @Override
-    protected void modifyDialog(Player player, ServerLinksDialogConstructor dialogConstructor) {
-        dialogConstructor.columns(columns).buttonWidth(buttonWidth);
+    protected DialogConstructor createDialogConstructor(Player player) {
+        return ServerLinksDialogConstructor.create().columns(columns).buttonWidth(buttonWidth);
     }
 }
