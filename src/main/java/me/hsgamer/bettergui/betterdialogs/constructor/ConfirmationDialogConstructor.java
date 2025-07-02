@@ -25,8 +25,8 @@ public class ConfirmationDialogConstructor implements DialogConstructor {
             null
     );
 
-    private ActionButton yesButton = DEFAULT_YES_BUTTON;
-    private ActionButton noButton = DEFAULT_NO_BUTTON;
+    private ActionButton yesButton;
+    private ActionButton noButton;
 
     private ConfirmationDialogConstructor() {
         // Private constructor to prevent instantiation
@@ -46,12 +46,21 @@ public class ConfirmationDialogConstructor implements DialogConstructor {
         return this;
     }
 
+    public ConfirmationDialogConstructor button(ActionButton button) {
+        if (yesButton == null) {
+            yesButton = button;
+        } else if (noButton == null) {
+            noButton = button;
+        }
+        return this;
+    }
+
     @Override
     public Dialog construct(CommonDialogData data) {
         return new ConfirmationDialog(
                 data,
-                yesButton,
-                noButton
+                yesButton != null ? yesButton : DEFAULT_YES_BUTTON,
+                noButton != null ? noButton : DEFAULT_NO_BUTTON
         );
     }
 }

@@ -3,7 +3,7 @@ package me.hsgamer.bettergui.betterdialogs.builder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.ItemComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
-import me.hsgamer.bettergui.betterdialogs.component.button.ConfirmationButtonComponent;
+import me.hsgamer.bettergui.betterdialogs.component.action.CustomActionComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.BooleanInputComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.NumberInputComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.SingleOptionInputComponent;
@@ -27,8 +27,7 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
         register(NumberInputComponent::new, "number-input", "number", "range", "slider");
         register(SingleOptionInputComponent::new, "single-option-input", "select", "combobox", "radio");
 
-        register(input -> new ConfirmationButtonComponent(input, true), "yes-button", "yes");
-        register(input -> new ConfirmationButtonComponent(input, false), "no-button", "no");
+        register(CustomActionComponent::new, "custom-action-button", "custom-action", "custom", "action");
     }
 
     @Override

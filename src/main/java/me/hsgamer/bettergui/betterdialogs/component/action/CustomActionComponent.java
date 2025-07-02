@@ -5,13 +5,14 @@ import com.github.retrooper.packetevents.protocol.dialog.action.DynamicCustomAct
 import com.github.retrooper.packetevents.resources.ResourceLocation;
 import me.hsgamer.bettergui.action.ActionApplier;
 import me.hsgamer.bettergui.api.requirement.Requirement;
-import me.hsgamer.bettergui.betterdialogs.builder.ActionComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.requirement.RequirementApplier;
 import me.hsgamer.bettergui.util.ProcessApplierConstants;
 import me.hsgamer.bettergui.util.SchedulerUtil;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.task.BatchRunnable;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -19,16 +20,16 @@ import java.util.UUID;
 public class CustomActionComponent extends ActionComponent {
     private final ResourceLocation actionId;
 
-    public CustomActionComponent(ActionComponentBuilder.Input input) {
+    public CustomActionComponent(DialogComponentBuilder.Input input) {
         super(input);
         ActionApplier actionApplier = Optional.ofNullable(MapUtils.getIfFound(input.options(), "action", "command"))
                 .map(o -> new ActionApplier(getMenu(), o))
                 .orElse(ActionApplier.EMPTY);
         RequirementApplier clickRequirementApplier = Optional.ofNullable(input.options().get("click-requirement"))
                 .flatMap(MapUtils::castOptionalStringObjectMap)
-                .map(m -> new RequirementApplier(getMenu(), input.buttonComponent().getName() + "_click", m))
+                .map(m -> new RequirementApplier(getMenu(), getName() + "_click", m))
                 .orElse(RequirementApplier.EMPTY);
-        this.actionId = input.buttonComponent().getMenu().registerAction(input.buttonComponent().getName(), player -> {
+        this.actionId = getMenu().registerAction(getName(), player -> {
             UUID uuid = player.getUniqueId();
             BatchRunnable batchRunnable = new BatchRunnable();
             batchRunnable.getTaskPool(ProcessApplierConstants.REQUIREMENT_ACTION_STAGE)
@@ -45,7 +46,7 @@ public class CustomActionComponent extends ActionComponent {
     }
 
     @Override
-    public Action getAction(Player player) {
+    protected @Nullable Action getAction(Player player) {
         return new DynamicCustomAction(actionId, null);
     }
 }
