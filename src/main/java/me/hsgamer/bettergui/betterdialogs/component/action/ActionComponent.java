@@ -60,7 +60,8 @@ public abstract class ActionComponent extends DialogComponent {
                 }
             }
             case NoticeDialogConstructor noticeDialogConstructor -> noticeDialogConstructor.button(button);
-            case ServerLinksDialogConstructor serverLinksDialogConstructor -> serverLinksDialogConstructor.exitButton(button);
+            case ServerLinksDialogConstructor serverLinksDialogConstructor ->
+                    serverLinksDialogConstructor.exitButton(button);
             case null, default -> {
             }
         }
