@@ -59,6 +59,7 @@ public abstract class ActionComponent extends DialogComponent {
                     multiActionDialogConstructor.exitButton(button);
                 }
             }
+            case NoticeDialogConstructor noticeDialogConstructor -> noticeDialogConstructor.button(button);
             case null, default -> {
             }
         }

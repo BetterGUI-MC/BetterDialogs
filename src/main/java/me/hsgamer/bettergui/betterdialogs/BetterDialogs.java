@@ -6,6 +6,7 @@ import me.hsgamer.bettergui.api.addon.GetPlugin;
 import me.hsgamer.bettergui.api.addon.Reloadable;
 import me.hsgamer.bettergui.betterdialogs.constructor.ConfirmationDialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.constructor.MultiActionDialogConstructor;
+import me.hsgamer.bettergui.betterdialogs.constructor.NoticeDialogConstructor;
 import me.hsgamer.bettergui.betterdialogs.listener.DialogCustomClickListener;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
 import me.hsgamer.bettergui.builder.MenuBuilder;
@@ -19,6 +20,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
         PacketEvents.getAPI().getEventManager().registerListener(dialogCustomClickListener);
         MenuBuilder.INSTANCE.register(config -> new DialogMenu(this, config, ConfirmationDialogConstructor::create), "confirmation-dialog", "confirm-dialog");
         MenuBuilder.INSTANCE.register(config -> new DialogMenu(this, config, MultiActionDialogConstructor::create), "multi-action-dialog", "action-dialog");
+        MenuBuilder.INSTANCE.register(config -> new DialogMenu(this, config, NoticeDialogConstructor::create), "notice-dialog");
     }
 
     @Override
