@@ -5,10 +5,7 @@ import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
 import com.github.retrooper.packetevents.protocol.dialog.button.CommonButtonData;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
-import me.hsgamer.bettergui.betterdialogs.constructor.ButtonDataConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.ConfirmationDialogConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
+import me.hsgamer.bettergui.betterdialogs.constructor.*;
 import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.Validate;
@@ -45,13 +42,24 @@ public abstract class ActionComponent extends DialogComponent {
     protected abstract @Nullable Action getAction(Player player);
 
     private void apply(ActionButton button, DialogConstructor dialogConstructor) {
-        if (dialogConstructor instanceof ConfirmationDialogConstructor confirmationDialogConstructor) {
-            if (assign == null) {
-                confirmationDialogConstructor.button(button);
-            } else if (assign.equalsIgnoreCase("yes")) {
-                confirmationDialogConstructor.yesButton(button);
-            } else if (assign.equalsIgnoreCase("no")) {
-                confirmationDialogConstructor.noButton(button);
+        switch (dialogConstructor) {
+            case ConfirmationDialogConstructor confirmationDialogConstructor -> {
+                if (assign == null) {
+                    confirmationDialogConstructor.button(button);
+                } else if (assign.equalsIgnoreCase("yes")) {
+                    confirmationDialogConstructor.yesButton(button);
+                } else if (assign.equalsIgnoreCase("no")) {
+                    confirmationDialogConstructor.noButton(button);
+                }
+            }
+            case MultiActionDialogConstructor multiActionDialogConstructor -> {
+                if (assign == null || !assign.equalsIgnoreCase("exit")) {
+                    multiActionDialogConstructor.button(button);
+                } else {
+                    multiActionDialogConstructor.exitButton(button);
+                }
+            }
+            case null, default -> {
             }
         }
     }
