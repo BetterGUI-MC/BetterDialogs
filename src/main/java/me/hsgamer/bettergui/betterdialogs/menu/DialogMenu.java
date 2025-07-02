@@ -31,9 +31,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class DialogMenu extends BaseMenu {
+public class DialogMenu<T extends DialogConstructor> extends BaseMenu {
     private final BetterDialogs instance;
-    private final Supplier<DialogConstructor> dialogConstructorSupplier;
+    private final Supplier<T> dialogConstructorSupplier;
     private final Map<String, DialogComponent> componentMap = new LinkedHashMap<>();
 
     private final String title;
@@ -42,7 +42,7 @@ public class DialogMenu extends BaseMenu {
     private final boolean pause;
     private final DialogAction afterAction;
 
-    public DialogMenu(BetterDialogs instance, Config config, Supplier<DialogConstructor> dialogConstructorSupplier) {
+    DialogMenu(BetterDialogs instance, Config config, Supplier<T> dialogConstructorSupplier) {
         super(config);
         this.instance = instance;
         this.dialogConstructorSupplier = dialogConstructorSupplier;
@@ -93,9 +93,13 @@ public class DialogMenu extends BaseMenu {
         }));
     }
 
+    protected void modifyDialog(Player player, T dialogConstructor) {
+        // This method can be overridden to modify the dialog constructor if needed
+    }
+
     public Dialog createDialog(Player player) {
         DialogDataConstructor dialogDataConstructor = DialogDataConstructor.create();
-        DialogConstructor dialogConstructor = dialogConstructorSupplier.get();
+        T dialogConstructor = dialogConstructorSupplier.get();
 
         dialogDataConstructor
                 .title(ComponentUtils.convertLegacy(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
@@ -103,6 +107,7 @@ public class DialogMenu extends BaseMenu {
                 .canCloseWithEscape(canCloseWithEscape)
                 .pause(pause)
                 .afterAction(afterAction);
+        modifyDialog(player, dialogConstructor);
 
         for (DialogComponent component : componentMap.values()) {
             component.apply(player, dialogDataConstructor, dialogConstructor);
