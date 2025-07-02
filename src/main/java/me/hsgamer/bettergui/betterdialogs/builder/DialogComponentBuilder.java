@@ -1,8 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.builder;
 
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
-import me.hsgamer.bettergui.betterdialogs.component.action.CustomActionComponent;
-import me.hsgamer.bettergui.betterdialogs.component.action.RunCommandActionComponent;
+import me.hsgamer.bettergui.betterdialogs.component.action.*;
 import me.hsgamer.bettergui.betterdialogs.component.body.ItemComponent;
 import me.hsgamer.bettergui.betterdialogs.component.body.TextComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.BooleanInputComponent;
@@ -30,6 +29,9 @@ public final class DialogComponentBuilder extends FunctionalMassBuilder<DialogCo
 
         register(CustomActionComponent::new, "custom-action-button", "custom-action", "custom", "action", "button");
         register(RunCommandActionComponent::new, "run-command-action", "run-command", "command", "execute", "run");
+        register(OpenUrlActionComponent::new, "open-url-action", "open-url", "open-link", "link", "url");
+        register(SuggestCommandActionComponent::new, "suggest-command-action", "suggest-command", "suggest", "suggestion");
+        register(CopyToClipboardActionCommand::new, "copy-to-clipboard-action", "copy-to-clipboard", "copy", "clipboard");
     }
 
     @Override
