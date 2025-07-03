@@ -20,6 +20,6 @@ public class SuggestCommandActionComponent extends ActionComponent {
 
     @Override
     protected void getAction(Player player, PEDialogActionBuilder builder) {
-        builder.suggestCommand().command(StringReplacerApplier.replace(command, player.getUniqueId(), this));
+        builder.suggestCommand(StringReplacerApplier.replace(command, player.getUniqueId(), this));
     }
 }

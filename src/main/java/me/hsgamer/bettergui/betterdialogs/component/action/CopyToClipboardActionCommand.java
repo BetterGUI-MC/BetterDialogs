@@ -20,6 +20,6 @@ public class CopyToClipboardActionCommand extends ActionComponent {
 
     @Override
     protected void getAction(Player player, PEDialogActionBuilder builder) {
-        builder.copyToClipboard().value(StringReplacerApplier.replace(value, player.getUniqueId(), this));
+        builder.copyToClipboard(StringReplacerApplier.replace(value, player.getUniqueId(), this));
     }
 }

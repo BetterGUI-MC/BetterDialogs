@@ -20,6 +20,6 @@ public class OpenUrlActionComponent extends ActionComponent {
 
     @Override
     protected void getAction(Player player, PEDialogActionBuilder builder) {
-        builder.openUrl().url(StringReplacerApplier.replace(url, player.getUniqueId(), this));
+        builder.openUrl(StringReplacerApplier.replace(url, player.getUniqueId(), this));
     }
 }

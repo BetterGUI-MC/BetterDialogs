@@ -42,6 +42,6 @@ public class CustomActionComponent extends ActionComponent {
 
     @Override
     protected void getAction(Player player, PEDialogActionBuilder builder) {
-        builder.dynamicCustom().id(id);
+        builder.dynamicCustom(id);
     }
 }

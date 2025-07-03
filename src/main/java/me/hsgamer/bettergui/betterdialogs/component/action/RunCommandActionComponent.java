@@ -29,9 +29,9 @@ public class RunCommandActionComponent extends ActionComponent {
     protected void getAction(Player player, PEDialogActionBuilder builder) {
         String replacedCommand = StringReplacerApplier.replace(command, player.getUniqueId(), this);
         if (isDynamic) {
-            builder.dynamicRunCommand().template(replacedCommand);
+            builder.dynamicRunCommand(replacedCommand);
         } else {
-            builder.runCommand().command(replacedCommand);
+            builder.runCommand(replacedCommand);
         }
     }
 }
