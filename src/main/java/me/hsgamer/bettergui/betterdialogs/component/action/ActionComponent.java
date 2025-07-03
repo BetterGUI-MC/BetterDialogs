@@ -16,7 +16,7 @@ public abstract class ActionComponent extends DialogComponent {
     private final String label;
     private final @Nullable String tooltip;
     private final int width;
-    private final String assign;
+    private final @Nullable String assign;
 
     protected ActionComponent(DialogComponentBuilder.Input input) {
         super(input);
@@ -34,7 +34,7 @@ public abstract class ActionComponent extends DialogComponent {
                 .orElse(150);
         assign = Optional.ofNullable(input.options().get("assign"))
                 .map(Object::toString)
-                .orElse("");
+                .orElse(null);
     }
 
     protected abstract void getAction(Player player, PEDialogActionBuilder builder);
@@ -50,7 +50,13 @@ public abstract class ActionComponent extends DialogComponent {
         };
         switch (dialog) {
             case PEConfirmationDialog confirmationDialog -> {
-                if (assign.equalsIgnoreCase("yes")) {
+                if (assign == null) {
+                    if (!confirmationDialog.hasYesAction()) {
+                        confirmationDialog.yesAction(actionConsumer);
+                    } else {
+                        confirmationDialog.noAction(actionConsumer);
+                    }
+                } else if (assign.equalsIgnoreCase("yes")) {
                     confirmationDialog.yesAction(actionConsumer);
                 } else if (assign.equalsIgnoreCase("no")) {
                     confirmationDialog.noAction(actionConsumer);
