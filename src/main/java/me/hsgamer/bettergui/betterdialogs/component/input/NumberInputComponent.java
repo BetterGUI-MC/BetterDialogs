@@ -1,16 +1,12 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
-import com.github.retrooper.packetevents.protocol.dialog.input.NumberRangeInputControl;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTNumber;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.Optional;
@@ -22,8 +18,8 @@ public class NumberInputComponent extends InputComponent<Number> {
     private final String labelFormat;
     private final String start;
     private final String end;
-    private final String initial;
-    private final String step;
+    private final @Nullable String initial;
+    private final @Nullable String step;
 
     public NumberInputComponent(DialogComponentBuilder.Input input) {
         super(input);
@@ -47,33 +43,34 @@ public class NumberInputComponent extends InputComponent<Number> {
                 .orElse("100");
         initial = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
-                .orElse(start);
+                .orElse(null);
         step = Optional.ofNullable(input.options().get("step"))
                 .map(Object::toString)
-                .orElse("1");
+                .orElse(null);
     }
 
     @Override
-    protected InputControl createControl(Player player) {
-        return new NumberRangeInputControl(
-                width,
-                ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)),
-                labelFormat,
-                new NumberRangeInputControl.RangeInfo(
-                        Validate.getNumber(StringReplacerApplier.replace(this.start, player.getUniqueId(), this))
-                                .map(Number::floatValue)
-                                .orElse(0F),
-                        Validate.getNumber(StringReplacerApplier.replace(this.end, player.getUniqueId(), this))
-                                .map(Number::floatValue)
-                                .orElse(100F),
-                        Validate.getNumber(StringReplacerApplier.replace(this.initial, player.getUniqueId(), this))
-                                .map(Number::floatValue)
-                                .orElse(0F),
-                        Validate.getNumber(StringReplacerApplier.replace(this.step, player.getUniqueId(), this))
-                                .map(Number::floatValue)
-                                .orElse(1F)
-                )
-        );
+    protected void apply(Player player, PEDialogInputBuilder builder) {
+        builder.numberRangeInput()
+                .width(width)
+                .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
+                .labelFormat(labelFormat)
+                .start(Validate.getNumber(StringReplacerApplier.replace(this.start, player.getUniqueId(), this))
+                        .map(Number::floatValue)
+                        .orElse(0F))
+                .end(Validate.getNumber(StringReplacerApplier.replace(this.end, player.getUniqueId(), this))
+                        .map(Number::floatValue)
+                        .orElse(100F))
+                .initial(Optional.ofNullable(initial)
+                        .map(s -> StringReplacerApplier.replace(s, player.getUniqueId(), this))
+                        .flatMap(Validate::getNumber)
+                        .map(Number::floatValue)
+                        .orElse(null))
+                .step(Optional.ofNullable(step)
+                        .map(s -> StringReplacerApplier.replace(s, player.getUniqueId(), this))
+                        .flatMap(Validate::getNumber)
+                        .map(Number::floatValue)
+                        .orElse(null));
     }
 
     @Override
@@ -91,11 +88,7 @@ public class NumberInputComponent extends InputComponent<Number> {
     }
 
     @Override
-    protected Number getValue(UUID uuid, NBT nbt) {
-        return switch (nbt) {
-            case NBTNumber nbtNumber -> nbtNumber.getAsNumber();
-            case NBTString nbtString -> Validate.getNumber(nbtString.getValue()).orElse(null);
-            case null, default -> null;
-        };
+    protected Number convertValue(UUID uuid, String rawValue) {
+        return Validate.getNumber(rawValue).orElse(null);
     }
 }

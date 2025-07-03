@@ -1,8 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import com.github.retrooper.packetevents.protocol.dialog.action.Action;
-import com.github.retrooper.packetevents.protocol.dialog.action.DynamicCustomAction;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
+import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
 import me.hsgamer.bettergui.action.ActionApplier;
 import me.hsgamer.bettergui.api.requirement.Requirement;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
@@ -12,13 +10,11 @@ import me.hsgamer.bettergui.util.SchedulerUtil;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.task.BatchRunnable;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class CustomActionComponent extends ActionComponent {
-    private final ResourceLocation actionId;
+    private final String id;
 
     public CustomActionComponent(DialogComponentBuilder.Input input) {
         super(input);
@@ -29,8 +25,7 @@ public class CustomActionComponent extends ActionComponent {
                 .flatMap(MapUtils::castOptionalStringObjectMap)
                 .map(m -> new RequirementApplier(getMenu(), getName() + "_click", m))
                 .orElse(RequirementApplier.EMPTY);
-        this.actionId = getMenu().registerAction(getName(), player -> {
-            UUID uuid = player.getUniqueId();
+        this.id = getMenu().registerAction(getName(), uuid -> {
             BatchRunnable batchRunnable = new BatchRunnable();
             batchRunnable.getTaskPool(ProcessApplierConstants.REQUIREMENT_ACTION_STAGE)
                     .addLast(process -> {
@@ -46,7 +41,7 @@ public class CustomActionComponent extends ActionComponent {
     }
 
     @Override
-    protected @Nullable Action getAction(Player player) {
-        return new DynamicCustomAction(actionId, null);
+    protected void getAction(Player player, PEDialogActionBuilder builder) {
+        builder.dynamicCustom().id(id);
     }
 }

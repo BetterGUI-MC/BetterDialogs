@@ -1,23 +1,19 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
-import com.github.retrooper.packetevents.protocol.dialog.input.TextInputControl;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class TextInputComponent extends InputComponent<String> {
     private final int width;
-    private final String label;
-    private final boolean labelVisible;
+    private final @Nullable String label;
     private final String initial;
     private final int maxLength;
     private final Integer maxLines;
@@ -34,11 +30,7 @@ public class TextInputComponent extends InputComponent<String> {
                 .orElse(200);
         label = Optional.ofNullable(input.options().get("label"))
                 .map(Object::toString)
-                .orElse("");
-        labelVisible = Optional.ofNullable(input.options().get("label-visible"))
-                .map(Object::toString)
-                .map(Boolean::parseBoolean)
-                .orElse(true);
+                .orElse(null);
         initial = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse("");
@@ -63,18 +55,14 @@ public class TextInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected InputControl createControl(Player player) {
-        return new TextInputControl(
-                width,
-                ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)),
-                labelVisible,
-                StringReplacerApplier.replace(initial, player.getUniqueId(), this),
-                maxLength,
-                new TextInputControl.MultilineOptions(
-                        maxLines,
-                        height
-                )
-        );
+    protected void apply(Player player, PEDialogInputBuilder builder) {
+        builder.textInput()
+                .width(width)
+                .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
+                .initial(StringReplacerApplier.replace(initial, player.getUniqueId(), this))
+                .maxLength(maxLength)
+                .maxLines(maxLines)
+                .height(height);
     }
 
     @Override
@@ -83,7 +71,7 @@ public class TextInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(UUID uuid, NBT nbt) {
-        return nbt instanceof NBTString nbtString ? nbtString.getValue() : "";
+    protected String convertValue(UUID uuid, String rawValue) {
+        return rawValue;
     }
 }

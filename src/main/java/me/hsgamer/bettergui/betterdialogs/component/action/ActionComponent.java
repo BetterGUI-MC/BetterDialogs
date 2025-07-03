@@ -1,24 +1,22 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import com.github.retrooper.packetevents.protocol.dialog.action.Action;
-import com.github.retrooper.packetevents.protocol.dialog.button.ActionButton;
-import com.github.retrooper.packetevents.protocol.dialog.button.CommonButtonData;
+import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
+import io.github.projectunified.unidialog.packetevents.dialog.*;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
-import me.hsgamer.bettergui.betterdialogs.constructor.*;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public abstract class ActionComponent extends DialogComponent {
     private final String label;
     private final @Nullable String tooltip;
     private final int width;
-    private final @Nullable String assign;
+    private final String assign;
 
     protected ActionComponent(DialogComponentBuilder.Input input) {
         super(input);
@@ -36,46 +34,39 @@ public abstract class ActionComponent extends DialogComponent {
                 .orElse(150);
         assign = Optional.ofNullable(input.options().get("assign"))
                 .map(Object::toString)
-                .orElse(null);
+                .orElse("");
     }
 
-    protected abstract @Nullable Action getAction(Player player);
+    protected abstract void getAction(Player player, PEDialogActionBuilder builder);
 
-    private void apply(ActionButton button, DialogConstructor dialogConstructor) {
-        switch (dialogConstructor) {
-            case ConfirmationDialogConstructor confirmationDialogConstructor -> {
-                if (assign == null) {
-                    confirmationDialogConstructor.button(button);
-                } else if (assign.equalsIgnoreCase("yes")) {
-                    confirmationDialogConstructor.yesButton(button);
+    @Override
+    public void apply(Player player, PEDialog<?> dialog) {
+        Consumer<PEDialogActionBuilder> actionConsumer = builder -> {
+            builder
+                    .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
+                    .tooltip(tooltip == null ? null : StringReplacerApplier.replace(tooltip, player.getUniqueId(), this))
+                    .width(width);
+            getAction(player, builder);
+        };
+        switch (dialog) {
+            case PEConfirmationDialog confirmationDialog -> {
+                if (assign.equalsIgnoreCase("yes")) {
+                    confirmationDialog.yesAction(actionConsumer);
                 } else if (assign.equalsIgnoreCase("no")) {
-                    confirmationDialogConstructor.noButton(button);
+                    confirmationDialog.noAction(actionConsumer);
                 }
             }
-            case MultiActionDialogConstructor multiActionDialogConstructor -> {
+            case PEMultiActionDialog multiActionDialog -> {
                 if (assign == null || !assign.equalsIgnoreCase("exit")) {
-                    multiActionDialogConstructor.button(button);
+                    multiActionDialog.action(actionConsumer);
                 } else {
-                    multiActionDialogConstructor.exitButton(button);
+                    multiActionDialog.exitAction(actionConsumer);
                 }
             }
-            case NoticeDialogConstructor noticeDialogConstructor -> noticeDialogConstructor.button(button);
-            case ServerLinksDialogConstructor serverLinksDialogConstructor ->
-                    serverLinksDialogConstructor.exitButton(button);
+            case PENoticeDialog noticeDialog -> noticeDialog.action(actionConsumer);
+            case PEServerLinksDialog serverLinksDialog -> serverLinksDialog.exitAction(actionConsumer);
             case null, default -> {
             }
         }
-    }
-
-    @Override
-    public void apply(Player player, DialogDataConstructor dialogDataConstructor, DialogConstructor dialogConstructor) {
-        CommonButtonData buttonData = ButtonDataConstructor.create()
-                .label(ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)))
-                .tooltip(tooltip == null ? null : ComponentUtils.convertLegacy(StringReplacerApplier.replace(tooltip, player.getUniqueId(), this)))
-                .width(width)
-                .construct();
-        Action action = getAction(player);
-        ActionButton button = new ActionButton(buttonData, action);
-        apply(button, dialogConstructor);
     }
 }

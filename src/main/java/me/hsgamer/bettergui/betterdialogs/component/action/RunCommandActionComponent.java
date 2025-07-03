@@ -1,14 +1,9 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import com.github.retrooper.packetevents.protocol.chat.clickevent.RunCommandClickEvent;
-import com.github.retrooper.packetevents.protocol.dialog.action.Action;
-import com.github.retrooper.packetevents.protocol.dialog.action.DialogTemplate;
-import com.github.retrooper.packetevents.protocol.dialog.action.DynamicRunCommandAction;
-import com.github.retrooper.packetevents.protocol.dialog.action.StaticAction;
+import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -31,10 +26,12 @@ public class RunCommandActionComponent extends ActionComponent {
     }
 
     @Override
-    protected @Nullable Action getAction(Player player) {
+    protected void getAction(Player player, PEDialogActionBuilder builder) {
         String replacedCommand = StringReplacerApplier.replace(command, player.getUniqueId(), this);
-        return isDynamic
-                ? new DynamicRunCommandAction(new DialogTemplate(replacedCommand))
-                : new StaticAction(new RunCommandClickEvent(replacedCommand));
+        if (isDynamic) {
+            builder.dynamicRunCommand().template(replacedCommand);
+        } else {
+            builder.runCommand().command(replacedCommand);
+        }
     }
 }

@@ -1,13 +1,9 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import com.github.retrooper.packetevents.protocol.dialog.input.Input;
-import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
+import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
+import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
 import org.bukkit.entity.Player;
 
 import java.util.Locale;
@@ -28,11 +24,11 @@ public abstract class InputComponent<T> extends DialogComponent {
         return name.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase(Locale.ROOT);
     }
 
-    protected abstract InputControl createControl(Player player);
+    protected abstract void apply(Player player, PEDialogInputBuilder builder);
 
     protected abstract String getValue(T value, UUID uuid, String args);
 
-    protected abstract T getValue(UUID uuid, NBT nbt);
+    protected abstract T convertValue(UUID uuid, String rawValue);
 
     public String getValue(UUID uuid, String args) {
         T value = values.get(uuid);
@@ -42,10 +38,10 @@ public abstract class InputComponent<T> extends DialogComponent {
         return getValue(value, uuid, args);
     }
 
-    public void applyValue(UUID uuid, NBTCompound nbtCompound) {
-        NBT nbt = nbtCompound.getTagOrNull(key);
-        if (nbt != null) {
-            T value = getValue(uuid, nbt);
+    public void applyValue(UUID uuid, Map<String, String> map) {
+        String rawValue = map.get(key);
+        if (rawValue != null) {
+            T value = convertValue(uuid, rawValue);
             if (value != null) {
                 values.put(uuid, value);
                 return;
@@ -55,8 +51,7 @@ public abstract class InputComponent<T> extends DialogComponent {
     }
 
     @Override
-    public void apply(Player player, DialogDataConstructor dialogDataConstructor, DialogConstructor dialogConstructor) {
-        Input input = new Input(key, createControl(player));
-        dialogDataConstructor.addInput(input);
+    public void apply(Player player, PEDialog<?> dialog) {
+        dialog.input(key, builder -> apply(player, builder));
     }
 }

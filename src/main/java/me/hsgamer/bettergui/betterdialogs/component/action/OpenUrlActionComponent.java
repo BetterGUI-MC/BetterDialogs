@@ -1,13 +1,10 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import com.github.retrooper.packetevents.protocol.chat.clickevent.OpenUrlClickEvent;
-import com.github.retrooper.packetevents.protocol.dialog.action.Action;
-import com.github.retrooper.packetevents.protocol.dialog.action.StaticAction;
+import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -22,9 +19,7 @@ public class OpenUrlActionComponent extends ActionComponent {
     }
 
     @Override
-    protected @Nullable Action getAction(Player player) {
-        return url == null
-                ? null
-                : new StaticAction(new OpenUrlClickEvent(StringReplacerApplier.replace(url, player.getUniqueId(), this)));
+    protected void getAction(Player player, PEDialogActionBuilder builder) {
+        builder.openUrl().url(StringReplacerApplier.replace(url, player.getUniqueId(), this));
     }
 }

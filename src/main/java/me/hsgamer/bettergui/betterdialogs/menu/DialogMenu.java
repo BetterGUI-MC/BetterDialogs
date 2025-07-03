@@ -1,21 +1,11 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
-import com.github.retrooper.packetevents.PacketEvents;
-import com.github.retrooper.packetevents.protocol.dialog.CommonDialogData;
-import com.github.retrooper.packetevents.protocol.dialog.Dialog;
-import com.github.retrooper.packetevents.protocol.dialog.DialogAction;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTCompound;
-import com.github.retrooper.packetevents.resources.ResourceLocation;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerClearDialog;
-import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerShowDialog;
+import io.github.projectunified.unidialog.core.dialog.Dialog;
+import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.InputComponent;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.menu.BaseMenu;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
@@ -28,17 +18,18 @@ import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public abstract class DialogMenu extends BaseMenu {
-    private final BetterDialogs instance;
+    protected final BetterDialogs instance;
     private final Map<String, DialogComponent> componentMap = new LinkedHashMap<>();
 
     private final String title;
     private final @Nullable String externalTitle;
     private final boolean canCloseWithEscape;
     private final boolean pause;
-    private final DialogAction afterAction;
+    private final Dialog.AfterAction afterAction;
 
     DialogMenu(BetterDialogs instance, Config config) {
         super(config);
@@ -62,12 +53,12 @@ public abstract class DialogMenu extends BaseMenu {
                 .map(Object::toString)
                 .map(s -> {
                     try {
-                        return DialogAction.valueOf(s.toUpperCase());
+                        return Dialog.AfterAction.valueOf(s.toUpperCase());
                     } catch (Exception e) {
                         return null;
                     }
                 })
-                .orElse(DialogAction.CLOSE);
+                .orElse(Dialog.AfterAction.CLOSE);
 
         for (Map.Entry<String, Object> configEntry : configSettings.entrySet()) {
             String key = configEntry.getKey();
@@ -90,48 +81,46 @@ public abstract class DialogMenu extends BaseMenu {
         }));
     }
 
-    protected abstract DialogConstructor createDialogConstructor(Player player);
+    protected abstract PEDialog<?> createDialogConstructor(Player player);
 
-    public Dialog createDialog(Player player) {
-        DialogDataConstructor dialogDataConstructor = DialogDataConstructor.create();
-        DialogConstructor dialogConstructor = createDialogConstructor(player);
+    public PEDialog<?> createDialog(Player player) {
+        PEDialog<?> dialog = createDialogConstructor(player);
 
-        dialogDataConstructor
-                .title(ComponentUtils.convertLegacy(StringReplacerApplier.replace(title, player.getUniqueId(), this)))
-                .externalTitle(externalTitle != null ? ComponentUtils.convertLegacy(StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this)) : null)
+        dialog
+                .title(StringReplacerApplier.replace(title, player.getUniqueId(), this))
+                .externalTitle(externalTitle != null ? StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this) : null)
                 .canCloseWithEscape(canCloseWithEscape)
                 .pause(pause)
                 .afterAction(afterAction);
 
         for (DialogComponent component : componentMap.values()) {
-            component.apply(player, dialogDataConstructor, dialogConstructor);
+            component.apply(player, dialog);
         }
 
-        CommonDialogData dialogData = dialogDataConstructor.construct();
-        return dialogConstructor.construct(dialogData);
+        return dialog;
     }
 
-    private void applyInputs(Player player, NBT nbt) {
-        if (!(nbt instanceof NBTCompound nbtCompound)) return;
+    private void applyInputs(UUID uuid, Map<String, String> map) {
         for (DialogComponent component : componentMap.values()) {
             if (component instanceof InputComponent<?> inputComponent) {
-                inputComponent.applyValue(player.getUniqueId(), nbtCompound);
+                inputComponent.applyValue(uuid, map);
             }
         }
     }
 
-    public ResourceLocation registerAction(String actionName, Consumer<Player> action) {
-        return instance.dialogCustomClickListener().registerAction(getName() + "_" + actionName, (player, nbt) -> {
-            applyInputs(player, nbt);
-            action.accept(player);
+    public String registerAction(String actionName, Consumer<UUID> action) {
+        String id = getName() + "_" + actionName;
+        instance.dialogManager().registerCustomAction(id, (uuid, map) -> {
+            applyInputs(uuid, map);
+            action.accept(uuid);
         });
+        return id;
     }
 
     @Override
     protected boolean createChecked(Player player, String[] args, boolean bypass) {
-        Dialog dialog = createDialog(player);
-        WrapperPlayServerShowDialog packet = new WrapperPlayServerShowDialog(dialog);
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+        PEDialog<?> dialog = createDialog(player);
+        dialog.opener().open(player.getUniqueId());
         return true;
     }
 
@@ -142,8 +131,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     public void close(Player player) {
-        WrapperPlayServerClearDialog packet = new WrapperPlayServerClearDialog();
-        PacketEvents.getAPI().getPlayerManager().sendPacket(player, packet);
+        instance.dialogManager().clearDialog(player.getUniqueId());
     }
 
     @Override

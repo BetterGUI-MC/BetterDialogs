@@ -1,15 +1,11 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
-import com.github.retrooper.packetevents.protocol.dialog.input.SingleOptionInputControl;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
+import io.github.projectunified.unidialog.packetevents.input.PESingleOptionInput;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,34 +47,18 @@ public class SingleOptionInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected InputControl createControl(Player player) {
-        Component label;
-        boolean labelVisible;
-        if (this.label != null) {
-            label = ComponentUtils.convertLegacy(StringReplacerApplier.replace(this.label, player.getUniqueId(), this));
-            labelVisible = true;
-        } else {
-            label = Component.empty();
-            labelVisible = false;
-        }
-
+    protected void apply(Player player, PEDialogInputBuilder builder) {
+        PESingleOptionInput input = builder.singleOptionInput()
+                .label(label == null ? null : StringReplacerApplier.replace(label, player.getUniqueId(), this))
+                .width(width);
         String defaultValue = this.defaultValue != null
                 ? StringReplacerApplier.replace(this.defaultValue, player.getUniqueId(), this)
                 : null;
-
-        List<SingleOptionInputControl.Entry> entries = options.entrySet().stream()
-                .map(entry -> {
-                    String key = entry.getKey();
-                    String value = StringReplacerApplier.replace(entry.getValue(), player.getUniqueId(), this);
-                    return new SingleOptionInputControl.Entry(
-                            key,
-                            ComponentUtils.convertLegacy(value),
-                            Objects.equals(key, defaultValue)
-                    );
-                })
-                .toList();
-
-        return new SingleOptionInputControl(width, entries, label, labelVisible);
+        for (Map.Entry<String, String> entry : options.entrySet()) {
+            String key = entry.getKey();
+            String value = StringReplacerApplier.replace(entry.getValue(), player.getUniqueId(), this);
+            input.option(key, value, Objects.equals(key, defaultValue));
+        }
     }
 
     @Override
@@ -91,7 +71,7 @@ public class SingleOptionInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(UUID uuid, NBT nbt) {
-        return nbt instanceof NBTString nbtString ? nbtString.getValue() : null;
+    protected String convertValue(UUID uuid, String rawValue) {
+        return rawValue;
     }
 }

@@ -1,12 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import com.github.retrooper.packetevents.protocol.dialog.input.BooleanInputControl;
-import com.github.retrooper.packetevents.protocol.dialog.input.InputControl;
-import com.github.retrooper.packetevents.protocol.nbt.NBT;
-import com.github.retrooper.packetevents.protocol.nbt.NBTByte;
-import com.github.retrooper.packetevents.protocol.nbt.NBTString;
+import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import org.bukkit.entity.Player;
@@ -38,13 +33,12 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected InputControl createControl(Player player) {
-        return new BooleanInputControl(
-                ComponentUtils.convertLegacy(StringReplacerApplier.replace(label, player.getUniqueId(), this)),
-                Boolean.parseBoolean(StringReplacerApplier.replace(initial, player.getUniqueId(), this)),
-                StringReplacerApplier.replace(onTrue, player.getUniqueId(), this),
-                StringReplacerApplier.replace(onFalse, player.getUniqueId(), this)
-        );
+    protected void apply(Player player, PEDialogInputBuilder builder) {
+        builder.booleanInput()
+                .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
+                .initial(Boolean.parseBoolean(StringReplacerApplier.replace(initial, player.getUniqueId(), this)))
+                .onTrue(StringReplacerApplier.replace(onTrue, player.getUniqueId(), this))
+                .onFalse(StringReplacerApplier.replace(onFalse, player.getUniqueId(), this));
     }
 
     @Override
@@ -53,11 +47,13 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(UUID uuid, NBT nbt) {
-        return switch (nbt) {
-            case NBTString nbtString -> nbtString.getValue();
-            case NBTByte nbtByte -> StringReplacerApplier.replace(nbtByte.getAsBool() ? onTrue : onFalse, uuid, this);
-            default -> null;
-        };
+    protected String convertValue(UUID uuid, String rawValue) {
+        if (rawValue.equalsIgnoreCase("true") || rawValue.equalsIgnoreCase("yes")) {
+            return StringReplacerApplier.replace(onTrue, uuid, this);
+        } else if (rawValue.equalsIgnoreCase("false") || rawValue.equalsIgnoreCase("no")) {
+            return StringReplacerApplier.replace(onFalse, uuid, this);
+        } else {
+            return rawValue;
+        }
     }
 }

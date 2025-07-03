@@ -1,15 +1,16 @@
 package me.hsgamer.bettergui.betterdialogs.component.body;
 
-import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessage;
-import com.github.retrooper.packetevents.protocol.dialog.body.PlainMessageDialogBody;
+import io.github.projectunified.unidialog.packetevents.body.PEDialogBodyBuilder;
+import io.github.projectunified.unidialog.packetevents.body.PETextBody;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
-import me.hsgamer.bettergui.betterdialogs.util.ComponentUtils;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class TextComponent extends DialogBodyComponent {
     private final String text;
@@ -29,15 +30,12 @@ public class TextComponent extends DialogBodyComponent {
                 .orElse(150);
     }
 
-    public PlainMessage createMessage(Player player) {
-        return new PlainMessage(
-                ComponentUtils.convertLegacy(StringReplacerApplier.replace(text, player.getUniqueId(), this)),
-                width
-        );
+    @Override
+    protected void apply(Player player, PEDialogBodyBuilder builder) {
+        getBodyConsumer(player.getUniqueId()).accept(builder.text());
     }
 
-    @Override
-    public PlainMessageDialogBody create(Player player) {
-        return new PlainMessageDialogBody(createMessage(player));
+    public Consumer<PETextBody> getBodyConsumer(UUID uuid) {
+        return body -> body.text(StringReplacerApplier.replace(text, uuid, this)).width(width);
     }
 }

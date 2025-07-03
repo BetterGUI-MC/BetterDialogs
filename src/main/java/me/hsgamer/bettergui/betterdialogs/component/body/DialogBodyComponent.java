@@ -1,10 +1,9 @@
 package me.hsgamer.bettergui.betterdialogs.component.body;
 
-import com.github.retrooper.packetevents.protocol.dialog.body.DialogBody;
+import io.github.projectunified.unidialog.packetevents.body.PEDialogBodyBuilder;
+import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogConstructor;
-import me.hsgamer.bettergui.betterdialogs.constructor.DialogDataConstructor;
 import org.bukkit.entity.Player;
 
 public abstract class DialogBodyComponent extends DialogComponent {
@@ -12,11 +11,10 @@ public abstract class DialogBodyComponent extends DialogComponent {
         super(input);
     }
 
-    protected abstract DialogBody create(Player player);
+    protected abstract void apply(Player player, PEDialogBodyBuilder builder);
 
     @Override
-    public void apply(Player player, DialogDataConstructor dialogDataConstructor, DialogConstructor dialogConstructor) {
-        DialogBody dialogBody = create(player);
-        dialogDataConstructor.addBody(dialogBody);
+    public void apply(Player player, PEDialog<?> dialog) {
+        dialog.body(builder -> apply(player, builder));
     }
 }
