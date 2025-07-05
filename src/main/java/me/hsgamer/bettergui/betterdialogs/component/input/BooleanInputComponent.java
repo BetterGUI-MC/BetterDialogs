@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
+import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
@@ -33,7 +33,7 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected void apply(Player player, PEDialogInputBuilder builder) {
+    protected void apply(Player player, DialogInputBuilder builder) {
         builder.booleanInput()
                 .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
                 .initial(Boolean.parseBoolean(StringReplacerApplier.replace(initial, player.getUniqueId(), this)))

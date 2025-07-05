@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
+import io.github.projectunified.unidialog.core.action.DialogActionBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
@@ -19,7 +19,7 @@ public class CopyToClipboardActionCommand extends ActionComponent {
     }
 
     @Override
-    protected void getAction(Player player, PEDialogActionBuilder builder) {
+    protected void getAction(Player player, DialogActionBuilder<?, ?> builder) {
         builder.copyToClipboard(StringReplacerApplier.replace(value, player.getUniqueId(), this));
     }
 }

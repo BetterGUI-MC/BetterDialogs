@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
-import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
+import io.github.projectunified.unidialog.core.dialog.Dialog;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
@@ -30,7 +30,7 @@ public class ServerLinksDialogMenu extends DialogMenu {
     }
 
     @Override
-    protected PEDialog<?> createDialogConstructor(Player player) {
+    protected Dialog<?, ?, ?, ?> createDialogConstructor(Player player) {
         return instance.dialogManager().createServerLinksDialog().columns(columns).buttonWidth(buttonWidth);
     }
 }

@@ -1,5 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs;
 
+import io.github.projectunified.unidialog.core.DialogManager;
 import io.github.projectunified.unidialog.packetevents.PocketEventsDialogManager;
 import me.hsgamer.bettergui.api.addon.GetLogger;
 import me.hsgamer.bettergui.api.addon.GetPlugin;
@@ -17,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Reloadable {
-    private final PocketEventsDialogManager dialogManager = new PocketEventsDialogManager("betterdialogs") {
+    private final DialogManager<?, ?, ?, ?, ?> dialogManager = new PocketEventsDialogManager("betterdialogs") {
         @Override
         protected @Nullable Player getPlayer(UUID uuid) {
             return Bukkit.getPlayer(uuid);
@@ -49,7 +50,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
         dialogManager.unregister();
     }
 
-    public PocketEventsDialogManager dialogManager() {
+    public DialogManager<?, ?, ?, ?, ?> dialogManager() {
         return dialogManager;
     }
 }

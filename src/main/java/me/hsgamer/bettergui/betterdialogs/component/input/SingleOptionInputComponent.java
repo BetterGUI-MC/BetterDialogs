@@ -1,7 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
-import io.github.projectunified.unidialog.packetevents.input.PESingleOptionInput;
+import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
+import io.github.projectunified.unidialog.core.input.SingleOptionInput;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
@@ -47,8 +47,8 @@ public class SingleOptionInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected void apply(Player player, PEDialogInputBuilder builder) {
-        PESingleOptionInput input = builder.singleOptionInput()
+    protected void apply(Player player, DialogInputBuilder builder) {
+        SingleOptionInput<?> input = builder.singleOptionInput()
                 .label(label == null ? null : StringReplacerApplier.replace(label, player.getUniqueId(), this))
                 .width(width);
         String defaultValue = this.defaultValue != null

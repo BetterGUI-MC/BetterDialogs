@@ -1,7 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.component.body;
 
-import io.github.projectunified.unidialog.packetevents.body.PEDialogBodyBuilder;
-import io.github.projectunified.unidialog.packetevents.body.PETextBody;
+import io.github.projectunified.unidialog.core.body.DialogBodyBuilder;
+import io.github.projectunified.unidialog.core.body.TextBody;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
@@ -31,11 +31,11 @@ public class TextComponent extends DialogBodyComponent {
     }
 
     @Override
-    protected void apply(Player player, PEDialogBodyBuilder builder) {
+    protected void apply(Player player, DialogBodyBuilder<?> builder) {
         getBodyConsumer(player.getUniqueId()).accept(builder.text());
     }
 
-    public Consumer<PETextBody> getBodyConsumer(UUID uuid) {
+    public Consumer<TextBody<?>> getBodyConsumer(UUID uuid) {
         return body -> body.text(StringReplacerApplier.replace(text, uuid, this)).width(width);
     }
 }

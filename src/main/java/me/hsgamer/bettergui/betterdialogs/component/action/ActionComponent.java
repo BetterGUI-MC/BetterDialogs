@@ -1,7 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
-import io.github.projectunified.unidialog.packetevents.action.PEDialogActionBuilder;
-import io.github.projectunified.unidialog.packetevents.dialog.*;
+import io.github.projectunified.unidialog.core.action.DialogActionBuilder;
+import io.github.projectunified.unidialog.core.dialog.*;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
@@ -37,11 +37,11 @@ public abstract class ActionComponent extends DialogComponent {
                 .orElse(null);
     }
 
-    protected abstract void getAction(Player player, PEDialogActionBuilder builder);
+    protected abstract void getAction(Player player, DialogActionBuilder<?, ?> builder);
 
     @Override
-    public void apply(Player player, PEDialog<?> dialog) {
-        Consumer<PEDialogActionBuilder> actionConsumer = builder -> {
+    public void apply(Player player, Dialog<?, ?, ?, ?> dialog) {
+        Consumer<DialogActionBuilder<?, ?>> actionConsumer = builder -> {
             builder
                     .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
                     .tooltip(tooltip == null ? null : StringReplacerApplier.replace(tooltip, player.getUniqueId(), this))
@@ -49,28 +49,29 @@ public abstract class ActionComponent extends DialogComponent {
             getAction(player, builder);
         };
         switch (dialog) {
-            case PEConfirmationDialog confirmationDialog -> {
+            case ConfirmationDialog<?, ?, ?, ?, ?, ?> confirmationDialog -> {
                 if (assign == null) {
                     if (!confirmationDialog.hasYesAction()) {
-                        confirmationDialog.yesAction(actionConsumer);
+                        confirmationDialog.yesAction(actionConsumer::accept);
                     } else {
-                        confirmationDialog.noAction(actionConsumer);
+                        confirmationDialog.noAction(actionConsumer::accept);
                     }
                 } else if (assign.equalsIgnoreCase("yes")) {
-                    confirmationDialog.yesAction(actionConsumer);
+                    confirmationDialog.yesAction(actionConsumer::accept);
                 } else if (assign.equalsIgnoreCase("no")) {
-                    confirmationDialog.noAction(actionConsumer);
+                    confirmationDialog.noAction(actionConsumer::accept);
                 }
             }
-            case PEMultiActionDialog multiActionDialog -> {
+            case MultiActionDialog<?, ?, ?, ?, ?, ?> multiActionDialog -> {
                 if (assign == null || !assign.equalsIgnoreCase("exit")) {
-                    multiActionDialog.action(actionConsumer);
+                    multiActionDialog.action(actionConsumer::accept);
                 } else {
-                    multiActionDialog.exitAction(actionConsumer);
+                    multiActionDialog.exitAction(actionConsumer::accept);
                 }
             }
-            case PENoticeDialog noticeDialog -> noticeDialog.action(actionConsumer);
-            case PEServerLinksDialog serverLinksDialog -> serverLinksDialog.exitAction(actionConsumer);
+            case NoticeDialog<?, ?, ?, ?, ?, ?> noticeDialog -> noticeDialog.action(actionConsumer::accept);
+            case ServerLinksDialog<?, ?, ?, ?, ?, ?> serverLinksDialog ->
+                    serverLinksDialog.exitAction(actionConsumer::accept);
             case null, default -> {
             }
         }

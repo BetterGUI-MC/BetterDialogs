@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.component;
 
-import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
+import io.github.projectunified.unidialog.core.dialog.Dialog;
 import me.hsgamer.bettergui.api.menu.MenuElement;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.menu.DialogMenu;
@@ -15,7 +15,7 @@ public abstract class DialogComponent implements MenuElement {
         this.menu = input.menu();
     }
 
-    public abstract void apply(Player player, PEDialog<?> dialog);
+    public abstract void apply(Player player, Dialog<?, ?, ?, ?> dialog);
 
     public String getName() {
         return name;

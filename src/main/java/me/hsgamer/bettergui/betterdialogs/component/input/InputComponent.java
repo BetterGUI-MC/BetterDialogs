@@ -1,7 +1,7 @@
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
-import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
-import io.github.projectunified.unidialog.packetevents.input.PEDialogInputBuilder;
+import io.github.projectunified.unidialog.core.dialog.Dialog;
+import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import org.bukkit.entity.Player;
@@ -24,7 +24,7 @@ public abstract class InputComponent<T> extends DialogComponent {
         return name.replaceAll("[^a-zA-Z0-9_]", "_").toLowerCase(Locale.ROOT);
     }
 
-    protected abstract void apply(Player player, PEDialogInputBuilder builder);
+    protected abstract void apply(Player player, DialogInputBuilder builder);
 
     protected abstract String getValue(T value, UUID uuid, String args);
 
@@ -51,7 +51,7 @@ public abstract class InputComponent<T> extends DialogComponent {
     }
 
     @Override
-    public void apply(Player player, PEDialog<?> dialog) {
+    public void apply(Player player, Dialog<?, ?, ?, ?> dialog) {
         dialog.input(key, builder -> apply(player, builder));
     }
 }

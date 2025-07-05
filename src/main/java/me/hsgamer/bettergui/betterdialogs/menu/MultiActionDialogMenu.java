@@ -1,6 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
-import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
+import io.github.projectunified.unidialog.core.dialog.Dialog;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.hscore.common.Validate;
 import me.hsgamer.hscore.config.Config;
@@ -22,7 +22,7 @@ public class MultiActionDialogMenu extends DialogMenu {
     }
 
     @Override
-    protected PEDialog<?> createDialogConstructor(Player player) {
+    protected Dialog<?, ?, ?, ?> createDialogConstructor(Player player) {
         return instance.dialogManager().createMultiActionDialog().columns(columns);
     }
 }

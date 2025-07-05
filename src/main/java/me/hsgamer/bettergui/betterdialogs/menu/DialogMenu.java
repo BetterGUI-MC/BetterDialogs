@@ -1,7 +1,6 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
 import io.github.projectunified.unidialog.core.dialog.Dialog;
-import io.github.projectunified.unidialog.packetevents.dialog.PEDialog;
 import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
@@ -81,10 +80,10 @@ public abstract class DialogMenu extends BaseMenu {
         }));
     }
 
-    protected abstract PEDialog<?> createDialogConstructor(Player player);
+    protected abstract Dialog<?, ?, ?, ?> createDialogConstructor(Player player);
 
-    public PEDialog<?> createDialog(Player player) {
-        PEDialog<?> dialog = createDialogConstructor(player);
+    public Dialog<?, ?, ?, ?> createDialog(Player player) {
+        Dialog<?, ?, ?, ?> dialog = createDialogConstructor(player);
 
         dialog
                 .title(StringReplacerApplier.replace(title, player.getUniqueId(), this))
@@ -119,8 +118,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     protected boolean createChecked(Player player, String[] args, boolean bypass) {
-        PEDialog<?> dialog = createDialog(player);
-        dialog.opener().open(player.getUniqueId());
+        createDialog(player).opener().open(player.getUniqueId());
         return true;
     }
 
