@@ -18,6 +18,7 @@
   <description>Another addon for creating dialogs</description>
 
   <properties>
+    <unidialog.version>1.3.0</unidialog.version>
     <java.version>21</java.version>
     <project.mainClass>me.hsgamer.bettergui.betterdialogs.BetterDialogs</project.mainClass>
   </properties>
@@ -29,11 +30,67 @@
     </repository>
   </repositories>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <shadedArtifactAttached>true</shadedArtifactAttached>
+              <createDependencyReducedPom>false</createDependencyReducedPom>
+              <relocations>
+                <!-- HSCore -->
+                <relocation>
+                  <pattern>me.hsgamer.hscore</pattern>
+                  <shadedPattern>me.hsgamer.bettergui.lib.core</shadedPattern>
+                </relocation>
+
+                <!-- MineLib -->
+                <relocation>
+                  <pattern>io.github.projectunified.minelib</pattern>
+                  <shadedPattern>me.hsgamer.bettergui.lib.minelib</shadedPattern>
+                </relocation>
+
+                <!-- bStats -->
+                <relocation>
+                  <pattern>org.bstats</pattern>
+                  <shadedPattern>me.hsgamer.bettergui.lib.bstats</shadedPattern>
+                </relocation>
+
+                <!-- UniDialog -->
+                <relocation>
+                  <pattern>io.github.projectunified.unidialog</pattern>
+                  <shadedPattern>me.hsgamer.bettergui.betterdialogs.lib.unidialog</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
   <dependencies>
     <dependency>
       <groupId>io.github.projectunified</groupId>
       <artifactId>uni-dialog-packetevents</artifactId>
-      <version>1.1.0</version>
+      <version>${unidialog.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.projectunified</groupId>
+      <artifactId>uni-dialog-paper</artifactId>
+      <version>${unidialog.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.projectunified</groupId>
+      <artifactId>uni-dialog-spigot</artifactId>
+      <version>${unidialog.version}</version>
     </dependency>
     <dependency>
       <groupId>com.github.retrooper</groupId>

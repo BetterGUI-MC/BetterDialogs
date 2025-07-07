@@ -3,6 +3,8 @@ package me.hsgamer.bettergui.betterdialogs.component.body;
 import io.github.projectunified.unidialog.core.body.DialogBodyBuilder;
 import io.github.projectunified.unidialog.core.body.ItemBody;
 import io.github.projectunified.unidialog.packetevents.body.PEItemBody;
+import io.github.projectunified.unidialog.paper.body.PaperItemBody;
+import io.github.projectunified.unidialog.spigot.body.SpigotItemBody;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.builder.ItemModifierBuilder;
@@ -65,8 +67,13 @@ public class ItemComponent extends DialogBodyComponent {
                 .width(width)
                 .description(description != null ? description.getBodyConsumer(player.getUniqueId())::accept : null)
                 .height(height);
+        ItemStack itemStack = itemBuilder.build(player.getUniqueId());
         if (itemBody instanceof PEItemBody peItemBody) {
-            peItemBody.item(SpigotReflectionUtil.decodeBukkitItemStack(itemBuilder.build(player.getUniqueId())));
+            peItemBody.item(SpigotReflectionUtil.decodeBukkitItemStack(itemStack));
+        } else if (itemBody instanceof PaperItemBody paperItemBody) {
+            paperItemBody.item(itemStack);
+        } else if (itemBody instanceof SpigotItemBody spigotItemBody) {
+            spigotItemBody.item(itemStack);
         }
     }
 }
