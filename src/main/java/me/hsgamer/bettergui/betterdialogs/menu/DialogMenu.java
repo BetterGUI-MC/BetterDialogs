@@ -124,7 +124,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     public void update(Player player) {
-        // EMPTY
+        createDialog(player).opener().open(player.getUniqueId());
     }
 
     @Override
