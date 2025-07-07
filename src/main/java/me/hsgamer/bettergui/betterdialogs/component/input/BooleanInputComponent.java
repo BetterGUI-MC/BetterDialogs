@@ -48,6 +48,13 @@ public class BooleanInputComponent extends InputComponent<String> {
 
     @Override
     protected String convertValue(UUID uuid, String rawValue) {
+        try {
+            float value = Float.parseFloat(rawValue);
+            rawValue = value == 0 ? "false" : "true";
+        } catch (NumberFormatException e) {
+            // Ignore the exception, keep the raw value as is
+        }
+
         if (rawValue.equalsIgnoreCase("true") || rawValue.equalsIgnoreCase("yes")) {
             return StringReplacerApplier.replace(onTrue, uuid, this);
         } else if (rawValue.equalsIgnoreCase("false") || rawValue.equalsIgnoreCase("no")) {
