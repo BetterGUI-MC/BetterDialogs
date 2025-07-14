@@ -29,7 +29,9 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
 
     @Override
     public boolean onLoad() {
-        if (Bukkit.getPluginManager().getPlugin("packetevents") != null) {
+        if (Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7)) {
+            dialogManager = new PaperDialogManager(getPlugin(), "betterdialogs");
+        } else if (Bukkit.getPluginManager().getPlugin("packetevents") != null) {
             dialogManager = new PocketEventsDialogManager("betterdialogs") {
                 @Override
                 protected @Nullable Player getPlayer(UUID uuid) {
@@ -42,8 +44,6 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
                     return p.getUniqueId();
                 }
             };
-        } else if (Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7)) {
-            dialogManager = new PaperDialogManager(getPlugin(), "betterdialogs");
         } else if (Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog")) {
             dialogManager = new SpigotDialogManager(getPlugin(), "betterdialogs");
         } else {
