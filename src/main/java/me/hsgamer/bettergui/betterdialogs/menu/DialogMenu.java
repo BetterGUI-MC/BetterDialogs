@@ -140,7 +140,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     public void close(Player player) {
-        instance.dialogManager().clearDialog(player.getUniqueId());
+        player.closeInventory();
     }
 
     @Override
