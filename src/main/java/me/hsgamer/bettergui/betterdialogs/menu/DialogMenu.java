@@ -51,7 +51,7 @@ public abstract class DialogMenu extends BaseMenu {
                 .map(Object::toString)
                 .map(Boolean::parseBoolean)
                 .orElse(false);
-        afterAction = Optional.ofNullable(menuSettings.get("after-action"))
+        afterAction = Optional.ofNullable(MapUtils.getIfFound(menuSettings, "after-action", "after"))
                 .map(Object::toString)
                 .map(s -> {
                     try {
@@ -86,9 +86,7 @@ public abstract class DialogMenu extends BaseMenu {
     protected abstract Dialog<?, ?, ?, ?> createDialogConstructor(Player player);
 
     public Dialog<?, ?, ?, ?> createDialog(Player player) {
-        Dialog<?, ?, ?, ?> dialog = createDialogConstructor(player);
-
-        dialog
+        Dialog<?, ?, ?, ?> dialog = createDialogConstructor(player)
                 .title(StringReplacerApplier.replace(title, player.getUniqueId(), this))
                 .externalTitle(externalTitle != null ? StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this) : null)
                 .canCloseWithEscape(canCloseWithEscape)
