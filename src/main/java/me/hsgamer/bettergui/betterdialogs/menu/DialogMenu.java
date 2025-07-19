@@ -6,11 +6,14 @@ import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.InputComponent;
 import me.hsgamer.bettergui.menu.BaseMenu;
+import me.hsgamer.bettergui.util.ProcessApplierConstants;
+import me.hsgamer.bettergui.util.SchedulerUtil;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.collections.map.CaseInsensitiveStringMap;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.StringReplacer;
 import me.hsgamer.hscore.config.Config;
+import me.hsgamer.hscore.task.BatchRunnable;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -118,8 +121,16 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     protected boolean createChecked(Player player, String[] args, boolean bypass) {
-        createDialog(player).opener().open(player.getUniqueId());
-        return true;
+        UUID uuid = player.getUniqueId();
+        if (createDialog(player).opener().open(uuid)) {
+            if (!openActionApplier.isEmpty()) {
+                BatchRunnable batchRunnable = new BatchRunnable();
+                batchRunnable.getTaskPool(ProcessApplierConstants.ACTION_STAGE).addLast(process -> openActionApplier.accept(uuid, process));
+                SchedulerUtil.async().run(batchRunnable);
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
