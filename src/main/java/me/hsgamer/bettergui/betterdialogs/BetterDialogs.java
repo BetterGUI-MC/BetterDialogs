@@ -8,55 +8,62 @@ import io.github.projectunified.unidialog.spigot.SpigotDialogManager;
 import me.hsgamer.bettergui.api.addon.GetLogger;
 import me.hsgamer.bettergui.api.addon.GetPlugin;
 import me.hsgamer.bettergui.api.addon.Reloadable;
+import me.hsgamer.bettergui.betterdialogs.config.MainConfig;
 import me.hsgamer.bettergui.betterdialogs.menu.ConfirmationDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.MultiActionDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.NoticeDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.ServerLinksDialogMenu;
 import me.hsgamer.bettergui.builder.MenuBuilder;
+import me.hsgamer.hscore.bukkit.config.BukkitConfig;
 import me.hsgamer.hscore.bukkit.utils.VersionUtils;
 import me.hsgamer.hscore.common.Validate;
+import me.hsgamer.hscore.config.proxy.ConfigGenerator;
 import me.hsgamer.hscore.expansion.common.Expansion;
+import me.hsgamer.hscore.expansion.extra.expansion.DataFolder;
 import me.hsgamer.hscore.logger.common.LogLevel;
 import me.hsgamer.hscore.logger.common.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
+import java.util.function.Function;
 
-public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Reloadable {
+public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Reloadable, DataFolder {
+    private final MainConfig mainConfig = ConfigGenerator.newInstance(MainConfig.class, new BukkitConfig(new File(getDataFolder(), "config.yml")));
     private DialogManager<?, ?, ?, ?, ?> dialogManager;
 
     @Override
     public boolean onLoad() {
-        if (Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7)) {
-            dialogManager = new PaperDialogManager(getPlugin(), "betterdialogs");
-        } else if (Bukkit.getPluginManager().getPlugin("packetevents") != null) {
-            dialogManager = new PocketEventsDialogManager("betterdialogs") {
-                @Override
-                protected @Nullable Player getPlayer(UUID uuid) {
-                    return Bukkit.getPlayer(uuid);
+        String dialogManagerName = mainConfig.dialogManager().toLowerCase();
+        Logger logger = getLogger();
+        if (dialogManagerName.equals("auto")) {
+            for (DialogManagerType type : DialogManagerType.values()) {
+                if (type.isAvailable()) {
+                    dialogManager = type.create(getPlugin());
+                    logger.log(LogLevel.INFO, "Using " + type.getRequirement() + " for BetterDialogs");
+                    return true;
                 }
-
-                @Override
-                protected UUID getPlayerId(Object player) {
-                    Player p = (Player) player;
-                    return p.getUniqueId();
-                }
-            };
-        } else if (Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog")) {
-            dialogManager = new SpigotDialogManager(getPlugin(), "betterdialogs");
+            }
+            logger.log(LogLevel.WARN, "No available dialog manager found.");
         } else {
-            Logger logger = getLogger();
-            logger.log(LogLevel.WARN, "BetterDialogs is not supported on this platform.");
-            logger.log(LogLevel.WARN, "The only supported platforms are:");
-            logger.log(LogLevel.WARN, "- PocketEvents (with Packetevents plugin)");
-            logger.log(LogLevel.WARN, "- Paper 1.21.7+");
-            logger.log(LogLevel.WARN, "- Spigot 1.21.6+ (with BungeeCord Dialog API)");
-            logger.log(LogLevel.WARN, "Please use the correct platform to use BetterDialogs.");
-            return false;
+            try {
+                DialogManagerType type = DialogManagerType.valueOf(dialogManagerName.toUpperCase());
+                if (type.isAvailable()) {
+                    dialogManager = type.create(getPlugin());
+                    logger.log(LogLevel.INFO, "Using " + type.getRequirement() + " for BetterDialogs");
+                    return true;
+                } else {
+                    logger.log(LogLevel.WARN, "The specified dialog manager '" + dialogManagerName + "' is not available.");
+                }
+            } catch (IllegalArgumentException e) {
+                logger.log(LogLevel.WARN, "Invalid dialog manager specified: " + dialogManagerName);
+            }
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -80,5 +87,56 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
 
     public DialogManager<?, ?, ?, ?, ?> dialogManager() {
         return dialogManager;
+    }
+
+    private enum DialogManagerType {
+        PAPER(
+                "Paper 1.21.7+",
+                () -> Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7),
+                plugin -> new PaperDialogManager(plugin, "betterdialogs")
+        ),
+        PACKETEVENTS(
+                "PocketEvents",
+                () -> Bukkit.getPluginManager().getPlugin("packetevents") != null,
+                plugin -> new PocketEventsDialogManager("betterdialogs") {
+                    @Override
+                    protected @Nullable Player getPlayer(UUID uuid) {
+                        return Bukkit.getPlayer(uuid);
+                    }
+
+                    @Override
+                    protected UUID getPlayerId(Object player) {
+                        Player p = (Player) player;
+                        return p.getUniqueId();
+                    }
+                }
+        ),
+        SPIGOT(
+                "Spigot 1.21.6+",
+                () -> Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog"),
+                plugin -> new SpigotDialogManager(plugin, "betterdialogs")
+        );
+
+        private final String requirement;
+        private final BooleanSupplier isAvailable;
+        private final Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor;
+
+        DialogManagerType(String requirement, BooleanSupplier isAvailable, Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor) {
+            this.requirement = requirement;
+            this.isAvailable = isAvailable;
+            this.constructor = constructor;
+        }
+
+        public String getRequirement() {
+            return requirement;
+        }
+
+        public boolean isAvailable() {
+            return isAvailable.getAsBoolean();
+        }
+
+        public DialogManager<?, ?, ?, ?, ?> create(Plugin plugin) {
+            return constructor.apply(plugin);
+        }
     }
 }
