@@ -44,7 +44,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
             for (DialogManagerType type : DialogManagerType.values()) {
                 if (type.isAvailable()) {
                     dialogManager = type.create(getPlugin());
-                    logger.log(LogLevel.INFO, "Using " + type.getRequirement() + " for BetterDialogs");
+                    logger.log(LogLevel.INFO, "Using " + type.name() + " for BetterDialogs");
                     return true;
                 }
             }
@@ -54,7 +54,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
                 DialogManagerType type = DialogManagerType.valueOf(dialogManagerName.toUpperCase());
                 if (type.isAvailable()) {
                     dialogManager = type.create(getPlugin());
-                    logger.log(LogLevel.INFO, "Using " + type.getRequirement() + " for BetterDialogs");
+                    logger.log(LogLevel.INFO, "Using " + type.name() + " for BetterDialogs");
                     return true;
                 } else {
                     logger.log(LogLevel.WARN, "The specified dialog manager '" + dialogManagerName + "' is not available.");
@@ -91,12 +91,10 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
 
     private enum DialogManagerType {
         PAPER(
-                "Paper 1.21.7+",
                 () -> Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7),
                 plugin -> new PaperDialogManager(plugin, "betterdialogs")
         ),
         PACKETEVENTS(
-                "PocketEvents",
                 () -> Bukkit.getPluginManager().getPlugin("packetevents") != null,
                 plugin -> new PocketEventsDialogManager("betterdialogs") {
                     @Override
@@ -112,23 +110,16 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
                 }
         ),
         SPIGOT(
-                "Spigot 1.21.6+",
                 () -> Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog"),
                 plugin -> new SpigotDialogManager(plugin, "betterdialogs")
         );
 
-        private final String requirement;
         private final BooleanSupplier isAvailable;
         private final Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor;
 
-        DialogManagerType(String requirement, BooleanSupplier isAvailable, Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor) {
-            this.requirement = requirement;
+        DialogManagerType(BooleanSupplier isAvailable, Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor) {
             this.isAvailable = isAvailable;
             this.constructor = constructor;
-        }
-
-        public String getRequirement() {
-            return requirement;
         }
 
         public boolean isAvailable() {
