@@ -30,7 +30,6 @@ public abstract class DialogMenu extends BaseMenu {
     private final String title;
     private final @Nullable String externalTitle;
     private final boolean canCloseWithEscape;
-    private final boolean pause;
     private final Dialog.AfterAction afterAction;
 
     DialogMenu(BetterDialogs instance, Config config) {
@@ -47,10 +46,6 @@ public abstract class DialogMenu extends BaseMenu {
                 .map(Object::toString)
                 .map(Boolean::parseBoolean)
                 .orElse(true);
-        pause = Optional.ofNullable(menuSettings.get("pause"))
-                .map(Object::toString)
-                .map(Boolean::parseBoolean)
-                .orElse(false);
         afterAction = Optional.ofNullable(MapUtils.getIfFound(menuSettings, "after-action", "after"))
                 .map(Object::toString)
                 .map(s -> {
@@ -90,7 +85,6 @@ public abstract class DialogMenu extends BaseMenu {
                 .title(StringReplacerApplier.replace(title, player.getUniqueId(), this))
                 .externalTitle(externalTitle != null ? StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this) : null)
                 .canCloseWithEscape(canCloseWithEscape)
-                .pause(pause)
                 .afterAction(afterAction);
 
         for (DialogComponent component : componentMap.values()) {
