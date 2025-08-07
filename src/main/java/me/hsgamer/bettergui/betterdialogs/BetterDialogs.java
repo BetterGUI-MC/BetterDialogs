@@ -14,12 +14,17 @@ import me.hsgamer.bettergui.betterdialogs.menu.MultiActionDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.NoticeDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.ServerLinksDialogMenu;
 import me.hsgamer.bettergui.builder.MenuBuilder;
+import me.hsgamer.bettergui.util.SchedulerUtil;
 import me.hsgamer.hscore.bukkit.config.BukkitConfig;
 import me.hsgamer.hscore.bukkit.utils.VersionUtils;
 import me.hsgamer.hscore.common.Validate;
 import me.hsgamer.hscore.config.proxy.ConfigGenerator;
 import me.hsgamer.hscore.expansion.common.Expansion;
 import me.hsgamer.hscore.expansion.extra.expansion.DataFolder;
+import me.hsgamer.hscore.license.common.LicenseChecker;
+import me.hsgamer.hscore.license.common.LicenseResult;
+import me.hsgamer.hscore.license.polymart.PolymartLicenseChecker;
+import me.hsgamer.hscore.license.spigotmc.SpigotLicenseChecker;
 import me.hsgamer.hscore.logger.common.LogLevel;
 import me.hsgamer.hscore.logger.common.Logger;
 import org.bukkit.Bukkit;
@@ -68,6 +73,7 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
 
     @Override
     public void onEnable() {
+        checkLicense();
         dialogManager.register();
         MenuBuilder.INSTANCE.register(config -> new ConfirmationDialogMenu(this, config), "confirmation-dialog", "confirm-dialog");
         MenuBuilder.INSTANCE.register(config -> new MultiActionDialogMenu(this, config), "multi-action-dialog", "action-dialog");
@@ -83,6 +89,37 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
     @Override
     public void onDisable() {
         dialogManager.unregister();
+    }
+
+    private void checkLicense() {
+        LicenseChecker licenseChecker = PolymartLicenseChecker.isAvailable()
+                ? new PolymartLicenseChecker("8246", true, true)
+                : new SpigotLicenseChecker("127759");
+        SchedulerUtil.async().run(() -> {
+            LicenseResult result = licenseChecker.checkLicense();
+            switch (result.getStatus()) {
+                case VALID:
+                    getLogger().log(LogLevel.INFO, "Thank you for supporting BetterDialogs. Your support is greatly appreciated");
+                    break;
+                case INVALID:
+                    getLogger().log(LogLevel.WARN, "Thank you for using BetterDialogs");
+                    getLogger().log(LogLevel.WARN, "If you like this addon, please consider supporting it by purchasing from one of these platforms:");
+                    getLogger().log(LogLevel.WARN, "- SpigotMC: https://www.spigotmc.org/resources/betterdialogs.127759/");
+                    getLogger().log(LogLevel.WARN, "- Polymart: https://polymart.org/product/8246/betterdialogs");
+                    break;
+                case OFFLINE:
+                    getLogger().log(LogLevel.WARN, "Cannot check your license for BetterDialogs. Please check your internet connection");
+                    getLogger().log(LogLevel.WARN, "Note: You can still use this addon without a license, and there is no limit on the features");
+                    getLogger().log(LogLevel.WARN, "However, if you like this addon, please consider supporting it by purchasing it from one of these platforms:");
+                    getLogger().log(LogLevel.WARN, "- SpigotMC: https://www.spigotmc.org/resources/betterdialogs.127759/");
+                    getLogger().log(LogLevel.WARN, "- Polymart: https://polymart.org/product/8246/betterdialogs");
+                    break;
+                case UNKNOWN:
+                    getLogger().log(LogLevel.WARN, "Cannot check your license for BetterDialogs. Please try again later");
+                    getLogger().log(LogLevel.WARN, "Note: You can still use this addon without a license, and there is no limit on the features");
+                    break;
+            }
+        });
     }
 
     public DialogManager<?, ?, ?, ?, ?> dialogManager() {
