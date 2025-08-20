@@ -1,5 +1,5 @@
 /*
-   Copyright 2025-2025 Huynh Tien
+   Copyright 2025-$YEAR Huynh Tien
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -13,18 +13,3 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package me.hsgamer.bettergui.betterdialogs.config;
-
-import me.hsgamer.hscore.config.annotation.Comment;
-import me.hsgamer.hscore.config.annotation.ConfigPath;
-
-public interface MainConfig {
-    @ConfigPath("dialog-manager")
-    @Comment({
-            "The dialog manager to use",
-            "Available options: paper, packetevents, spigot, auto",
-    })
-    default String dialogManager() {
-        return "auto";
-    }
-}
