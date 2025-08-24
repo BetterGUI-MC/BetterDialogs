@@ -48,7 +48,7 @@ public class DialogManagerProvider {
             for (DialogManagerType type : DialogManagerType.values()) {
                 if (type.isAvailable()) {
                     dialogManagerType = type;
-                    logger.log(LogLevel.INFO, "Using " + type.name() + " for BetterDialogs");
+                    break;
                 }
             }
         } else {
@@ -56,7 +56,6 @@ public class DialogManagerProvider {
                 DialogManagerType type = DialogManagerType.valueOf(name.toUpperCase());
                 if (type.isAvailable()) {
                     dialogManagerType = type;
-                    logger.log(LogLevel.INFO, "Using " + type.name() + " for BetterDialogs");
                 } else {
                     logger.log(LogLevel.WARN, "The specified dialog manager '" + name + "' is not available.");
                 }
@@ -69,6 +68,7 @@ public class DialogManagerProvider {
             return false;
         }
 
+        logger.log(LogLevel.INFO, "Using " + dialogManagerType.name() + " for BetterDialogs");
         dialogManager = dialogManagerType.constructor.apply(plugin);
         textGetter = dialogManagerType.textGetterSupplier.get();
         return true;
