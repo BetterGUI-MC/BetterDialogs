@@ -43,7 +43,7 @@ public class PacketEventsTextGetter implements TextGetter {
             return map.entrySet().stream()
                     .filter(e -> e.getKey() instanceof String)
                     .filter(e -> e.getValue() != null)
-                    .map(e -> Map.entry((String) e.getKey(), new Text(false, e.getValue().toString(), (s, p) -> GsonComponentSerializer.gson().deserialize(s))))
+                    .map(e -> Map.entry((String) e.getKey(), new Text(true, e.getValue().toString(), (s, p) -> GsonComponentSerializer.gson().deserialize(s))))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,

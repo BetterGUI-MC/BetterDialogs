@@ -31,7 +31,7 @@ public class PaperTextGetter implements TextGetter {
         String[] miniKeys = Arrays.stream(keys).flatMap(k -> Stream.of("mini-" + k, k + "$")).toArray(String[]::new);
         Optional<String> miniText = Optional.ofNullable(MapUtils.getIfFound(input, miniKeys)).map(Object::toString);
         if (miniText.isPresent()) {
-            return Optional.of(new Text(false, miniText.get(), (s, p) -> MiniMessage.miniMessage().deserialize(s)));
+            return Optional.of(new Text(true, miniText.get(), (s, p) -> MiniMessage.miniMessage().deserialize(s)));
         }
 
         String[] jsonKeys = Arrays.stream(keys).map(k -> "json-" + k).toArray(String[]::new);
@@ -51,7 +51,7 @@ public class PaperTextGetter implements TextGetter {
             return miniMap.entrySet().stream()
                     .filter(e -> e.getKey() instanceof String)
                     .filter(e -> e.getValue() != null)
-                    .map(e -> Map.entry((String) e.getKey(), new Text(false, e.getValue().toString(), (s, p) -> MiniMessage.miniMessage().deserialize(s))))
+                    .map(e -> Map.entry((String) e.getKey(), new Text(true, e.getValue().toString(), (s, p) -> MiniMessage.miniMessage().deserialize(s))))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
