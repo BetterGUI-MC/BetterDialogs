@@ -80,7 +80,7 @@ public class ItemComponent extends DialogBodyComponent {
                 .showDecorations(showDecorations)
                 .showTooltip(showTooltip)
                 .width(width)
-                .description(description != null ? description.getBodyConsumer(player.getUniqueId())::accept : null)
+                .description(description != null ? description.getBodyConsumer(player)::accept : null)
                 .height(height);
         ItemStack itemStack = itemBuilder.build(player.getUniqueId());
         if (itemBody instanceof PEItemBody peItemBody) {

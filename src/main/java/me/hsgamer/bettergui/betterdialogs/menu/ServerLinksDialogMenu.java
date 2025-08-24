@@ -16,7 +16,7 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
 import io.github.projectunified.unidialog.core.dialog.Dialog;
-import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
 import me.hsgamer.hscore.config.Config;
@@ -28,8 +28,8 @@ public class ServerLinksDialogMenu extends DialogMenu {
     private final int columns;
     private final int buttonWidth;
 
-    public ServerLinksDialogMenu(BetterDialogs instance, Config config) {
-        super(instance, config);
+    public ServerLinksDialogMenu(Config config) {
+        super(config);
         this.columns = Optional.ofNullable(menuSettings.get("columns"))
                 .map(Object::toString)
                 .flatMap(Validate::getNumber)
@@ -46,6 +46,6 @@ public class ServerLinksDialogMenu extends DialogMenu {
 
     @Override
     protected Dialog<?, ?, ?, ?> createDialogConstructor(Player player) {
-        return instance.dialogManager().createServerLinksDialog().columns(columns).buttonWidth(buttonWidth);
+        return DialogManagerProvider.dialogManager().createServerLinksDialog().columns(columns).buttonWidth(buttonWidth);
     }
 }

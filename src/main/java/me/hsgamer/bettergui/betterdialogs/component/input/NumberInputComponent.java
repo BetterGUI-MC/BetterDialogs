@@ -15,11 +15,16 @@
 */
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
+import io.github.projectunified.unidialog.adventure.input.AdventureNumberRangeInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
+import io.github.projectunified.unidialog.core.input.NumberRangeInput;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +34,7 @@ import java.util.UUID;
 
 public class NumberInputComponent extends InputComponent<Number> {
     private final int width;
-    private final String label;
+    private final Text label;
     private final String labelFormat;
     private final String start;
     private final String end;
@@ -44,9 +49,8 @@ public class NumberInputComponent extends InputComponent<Number> {
                 .map(Number::intValue)
                 .filter(width -> width > 0)
                 .orElse(200);
-        label = Optional.ofNullable(input.options().get("label"))
-                .map(Object::toString)
-                .orElse("");
+        label = DialogManagerProvider.textGetter().get(input.options(), "label")
+                .orElseGet(() -> Text.of(""));
         labelFormat = Optional.ofNullable(input.options().get("label-format"))
                 .map(Object::toString)
                 .orElse("options.generic_value");
@@ -66,9 +70,8 @@ public class NumberInputComponent extends InputComponent<Number> {
 
     @Override
     protected void apply(Player player, DialogInputBuilder builder) {
-        builder.numberRangeInput()
+        NumberRangeInput<?> input = builder.numberRangeInput()
                 .width(width)
-                .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
                 .labelFormat(labelFormat)
                 .start(Validate.getNumber(StringReplacerApplier.replace(this.start, player.getUniqueId(), this))
                         .map(Number::floatValue)
@@ -86,6 +89,13 @@ public class NumberInputComponent extends InputComponent<Number> {
                         .flatMap(Validate::getNumber)
                         .map(Number::floatValue)
                         .orElse(null));
+
+        String replacedLabel = StringReplacerApplier.replace(label.text(), player.getUniqueId(), this);
+        if (label.isAdventure() && input instanceof AdventureNumberRangeInput<?> adventureInput) {
+            adventureInput.label((Component) label.parser().apply(replacedLabel, player));
+        } else {
+            input.label(replacedLabel);
+        }
     }
 
     @Override

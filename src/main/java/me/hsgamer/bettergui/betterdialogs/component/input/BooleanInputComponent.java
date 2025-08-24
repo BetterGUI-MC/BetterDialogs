@@ -15,17 +15,22 @@
 */
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
+import io.github.projectunified.unidialog.adventure.input.AdventureBooleanInput;
+import io.github.projectunified.unidialog.core.input.BooleanInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public class BooleanInputComponent extends InputComponent<String> {
-    private final String label;
+    private final Text label;
     private final String initial;
     private final String onTrue;
     private final String onFalse;
@@ -33,9 +38,8 @@ public class BooleanInputComponent extends InputComponent<String> {
     public BooleanInputComponent(DialogComponentBuilder.Input input) {
         super(input);
 
-        label = Optional.ofNullable(input.options().get("label"))
-                .map(Object::toString)
-                .orElse("Boolean Input");
+        label = DialogManagerProvider.textGetter().get(input.options(), "label")
+                .orElseGet(() -> Text.of("Boolean Input"));
         initial = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse("");
@@ -49,11 +53,17 @@ public class BooleanInputComponent extends InputComponent<String> {
 
     @Override
     protected void apply(Player player, DialogInputBuilder builder) {
-        builder.booleanInput()
-                .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
+        BooleanInput<?> input = builder.booleanInput()
                 .initial(Boolean.parseBoolean(StringReplacerApplier.replace(initial, player.getUniqueId(), this)))
                 .onTrue(StringReplacerApplier.replace(onTrue, player.getUniqueId(), this))
                 .onFalse(StringReplacerApplier.replace(onFalse, player.getUniqueId(), this));
+
+        String replacedLabel = StringReplacerApplier.replace(label.text(), player.getUniqueId(), this);
+        if (label.isAdventure() && input instanceof AdventureBooleanInput<?> adventureInput) {
+            adventureInput.label((Component) label.parser().apply(replacedLabel, player));
+        } else {
+            input.label(replacedLabel);
+        }
     }
 
     @Override

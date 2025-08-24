@@ -15,11 +15,13 @@
 */
 package me.hsgamer.bettergui.betterdialogs.menu;
 
+import io.github.projectunified.unidialog.adventure.dialog.AdventureDialog;
 import io.github.projectunified.unidialog.core.dialog.Dialog;
-import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import me.hsgamer.bettergui.betterdialogs.component.input.InputComponent;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.menu.BaseMenu;
 import me.hsgamer.bettergui.util.ProcessApplierConstants;
 import me.hsgamer.bettergui.util.SchedulerUtil;
@@ -29,6 +31,7 @@ import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.StringReplacer;
 import me.hsgamer.hscore.config.Config;
 import me.hsgamer.hscore.task.BatchRunnable;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,23 +42,19 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public abstract class DialogMenu extends BaseMenu {
-    protected final BetterDialogs instance;
     private final Map<String, DialogComponent> componentMap = new LinkedHashMap<>();
 
-    private final String title;
-    private final @Nullable String externalTitle;
+    private final Text title;
+    private final @Nullable Text externalTitle;
     private final boolean canCloseWithEscape;
     private final Dialog.AfterAction afterAction;
 
-    DialogMenu(BetterDialogs instance, Config config) {
+    DialogMenu(Config config) {
         super(config);
-        this.instance = instance;
 
-        title = Optional.ofNullable(menuSettings.get("title"))
-                .map(Object::toString)
-                .orElse("Dialog Menu");
-        externalTitle = Optional.ofNullable(menuSettings.get("external-title"))
-                .map(Object::toString)
+        title = DialogManagerProvider.textGetter().get(menuSettings, "title")
+                .orElseGet(() -> Text.of("Dialog Menu"));
+        externalTitle = DialogManagerProvider.textGetter().get(menuSettings, "external-title")
                 .orElse(null);
         canCloseWithEscape = Optional.ofNullable(menuSettings.get("can-close-with-escape"))
                 .map(Object::toString)
@@ -97,10 +96,24 @@ public abstract class DialogMenu extends BaseMenu {
 
     public Dialog<?, ?, ?, ?> createDialog(Player player) {
         Dialog<?, ?, ?, ?> dialog = createDialogConstructor(player)
-                .title(StringReplacerApplier.replace(title, player.getUniqueId(), this))
-                .externalTitle(externalTitle != null ? StringReplacerApplier.replace(externalTitle, player.getUniqueId(), this) : null)
                 .canCloseWithEscape(canCloseWithEscape)
                 .afterAction(afterAction);
+
+        String replacedTitle = StringReplacerApplier.replace(title.text(), player.getUniqueId(), this);
+        if (title.isAdventure() && dialog instanceof AdventureDialog<?, ?, ?, ?> adventureDialog) {
+            adventureDialog.title((Component) title.parser().apply(replacedTitle, player));
+        } else {
+            dialog.title(replacedTitle);
+        }
+
+        if (externalTitle != null) {
+            String replacedExternalTitle = StringReplacerApplier.replace(externalTitle.text(), player.getUniqueId(), this);
+            if (externalTitle.isAdventure() && dialog instanceof AdventureDialog<?, ?, ?, ?> adventureDialog) {
+                adventureDialog.externalTitle((Component) externalTitle.parser().apply(replacedExternalTitle, player));
+            } else {
+                dialog.externalTitle(replacedExternalTitle);
+            }
+        }
 
         for (DialogComponent component : componentMap.values()) {
             component.apply(player, dialog);
@@ -119,7 +132,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     public String registerAction(String actionName, Consumer<UUID> action) {
         String id = getName() + "_" + actionName;
-        instance.dialogManager().registerCustomAction(id, (uuid, map) -> {
+        DialogManagerProvider.dialogManager().registerCustomAction(id, (uuid, map) -> {
             applyInputs(uuid, map);
             action.accept(uuid);
         });
@@ -147,7 +160,7 @@ public abstract class DialogMenu extends BaseMenu {
 
     @Override
     public void close(Player player) {
-        if (!instance.dialogManager().clearDialog(player.getUniqueId())) {
+        if (!DialogManagerProvider.dialogManager().clearDialog(player.getUniqueId())) {
             player.closeInventory();
         }
     }

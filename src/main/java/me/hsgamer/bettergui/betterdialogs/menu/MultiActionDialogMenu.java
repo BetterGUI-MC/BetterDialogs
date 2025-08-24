@@ -16,7 +16,7 @@
 package me.hsgamer.bettergui.betterdialogs.menu;
 
 import io.github.projectunified.unidialog.core.dialog.Dialog;
-import me.hsgamer.bettergui.betterdialogs.BetterDialogs;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.hscore.common.Validate;
 import me.hsgamer.hscore.config.Config;
 import org.bukkit.entity.Player;
@@ -26,8 +26,8 @@ import java.util.Optional;
 public class MultiActionDialogMenu extends DialogMenu {
     private final int columns;
 
-    public MultiActionDialogMenu(BetterDialogs instance, Config config) {
-        super(instance, config);
+    public MultiActionDialogMenu(Config config) {
+        super(config);
         this.columns = Optional.ofNullable(menuSettings.get("columns"))
                 .map(Object::toString)
                 .flatMap(Validate::getNumber)
@@ -38,6 +38,6 @@ public class MultiActionDialogMenu extends DialogMenu {
 
     @Override
     protected Dialog<?, ?, ?, ?> createDialogConstructor(Player player) {
-        return instance.dialogManager().createMultiActionDialog().columns(columns);
+        return DialogManagerProvider.dialogManager().createMultiActionDialog().columns(columns);
     }
 }

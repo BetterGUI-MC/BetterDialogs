@@ -15,22 +15,28 @@
 */
 package me.hsgamer.bettergui.betterdialogs.component.input;
 
+import io.github.projectunified.unidialog.adventure.input.AdventureSingleOptionInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
 import io.github.projectunified.unidialog.core.input.SingleOptionInput;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class SingleOptionInputComponent extends InputComponent<String> {
     private final int width;
-    private final @Nullable String label;
-    private final Map<String, String> options;
+    private final @Nullable Text label;
+    private final Map<String, Text> options;
     private final @Nullable String defaultValue;
 
     public SingleOptionInputComponent(DialogComponentBuilder.Input input) {
@@ -42,20 +48,8 @@ public class SingleOptionInputComponent extends InputComponent<String> {
                 .map(Number::intValue)
                 .filter(width -> width > 0)
                 .orElse(200);
-        label = Optional.ofNullable(input.options().get("label"))
-                .map(Object::toString)
-                .orElse(null);
-        options = Optional.ofNullable(input.options().get("options"))
-                .flatMap(MapUtils::castOptionalStringObjectMap)
-                .orElse(Collections.emptyMap())
-                .entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> Optional.ofNullable(entry.getValue()).map(Object::toString).orElse(entry.getKey()),
-                        (a, b) -> a, // In case of duplicate keys, keep the first one
-                        HashMap::new
-                ));
+        label = DialogManagerProvider.textGetter().get(input.options(), "label").orElse(null);
+        options = DialogManagerProvider.textGetter().getMap(input.options(), "options");
         defaultValue = Optional.ofNullable(MapUtils.getIfFound(input.options(), "default", "initial"))
                 .map(Object::toString)
                 .orElse(null);
@@ -63,24 +57,36 @@ public class SingleOptionInputComponent extends InputComponent<String> {
 
     @Override
     protected void apply(Player player, DialogInputBuilder builder) {
-        SingleOptionInput<?> input = builder.singleOptionInput()
-                .label(label == null ? null : StringReplacerApplier.replace(label, player.getUniqueId(), this))
-                .width(width);
+        SingleOptionInput<?> input = builder.singleOptionInput().width(width);
+        if (label != null) {
+            String replacedLabel = StringReplacerApplier.replace(label.text(), player.getUniqueId(), this);
+            if (label.isAdventure() && input instanceof AdventureSingleOptionInput<?> adventureInput) {
+                adventureInput.label((Component) label.parser().apply(replacedLabel, player));
+            } else {
+                input.label(replacedLabel);
+            }
+        }
         String defaultValue = this.defaultValue != null
                 ? StringReplacerApplier.replace(this.defaultValue, player.getUniqueId(), this)
                 : null;
-        for (Map.Entry<String, String> entry : options.entrySet()) {
+        for (Map.Entry<String, Text> entry : options.entrySet()) {
             String key = entry.getKey();
-            String value = StringReplacerApplier.replace(entry.getValue(), player.getUniqueId(), this);
-            input.option(key, value, Objects.equals(key, defaultValue));
+            String replacedValue = StringReplacerApplier.replace(entry.getValue().text(), player.getUniqueId(), this);
+            if (entry.getValue().isAdventure() && input instanceof AdventureSingleOptionInput<?> adventureInput) {
+                adventureInput.option(key, (Component) entry.getValue().parser().apply(replacedValue, player), Objects.equals(key, defaultValue));
+            } else {
+                input.option(key, replacedValue, Objects.equals(key, defaultValue));
+            }
         }
     }
 
     @Override
     protected String getValue(String value, UUID uuid, String args) {
         if ("display".equalsIgnoreCase(args)) {
-            String displayValue = options.getOrDefault(value, value);
-            return StringReplacerApplier.replace(displayValue, uuid, this);
+            Text displayValue = options.get(value);
+            if (displayValue != null) {
+                return StringReplacerApplier.replace(displayValue.text(), uuid, this);
+            }
         }
         return value;
     }

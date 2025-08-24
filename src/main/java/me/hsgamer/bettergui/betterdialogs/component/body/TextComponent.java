@@ -15,28 +15,29 @@
 */
 package me.hsgamer.bettergui.betterdialogs.component.body;
 
+import io.github.projectunified.unidialog.adventure.body.AdventureTextBody;
 import io.github.projectunified.unidialog.core.body.DialogBodyBuilder;
 import io.github.projectunified.unidialog.core.body.TextBody;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
-import me.hsgamer.hscore.common.MapUtils;
 import me.hsgamer.hscore.common.Validate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public class TextComponent extends DialogBodyComponent {
-    private final String text;
+    private final Text text;
     private final int width;
 
     public TextComponent(DialogComponentBuilder.Input input) {
         super(input);
 
-        text = Optional.ofNullable(MapUtils.getIfFound(input.options(), "text", "message"))
-                .map(Object::toString)
-                .orElse("Text");
+        text = DialogManagerProvider.textGetter().get(input.options(), "text", "message")
+                .orElseGet(() -> Text.of("Text"));
         width = Optional.ofNullable(input.options().get("width"))
                 .map(Object::toString)
                 .flatMap(Validate::getNumber)
@@ -47,10 +48,19 @@ public class TextComponent extends DialogBodyComponent {
 
     @Override
     protected void apply(Player player, DialogBodyBuilder<?> builder) {
-        getBodyConsumer(player.getUniqueId()).accept(builder.text());
+        getBodyConsumer(player).accept(builder.text());
     }
 
-    public Consumer<TextBody<?>> getBodyConsumer(UUID uuid) {
-        return body -> body.text(StringReplacerApplier.replace(text, uuid, this)).width(width);
+    public Consumer<TextBody<?>> getBodyConsumer(Player player) {
+        return body -> {
+            body.width(width);
+
+            String replacedText = StringReplacerApplier.replace(text.text(), player.getUniqueId(), this);
+            if (text.isAdventure() && body instanceof AdventureTextBody<?> adventureBody) {
+                adventureBody.text((Component) text.parser().apply(replacedText, player));
+            } else {
+                body.text(replacedText);
+            }
+        };
     }
 }

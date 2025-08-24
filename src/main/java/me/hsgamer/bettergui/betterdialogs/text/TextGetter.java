@@ -13,20 +13,13 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-package me.hsgamer.bettergui.betterdialogs.menu;
+package me.hsgamer.bettergui.betterdialogs.text;
 
-import io.github.projectunified.unidialog.core.dialog.Dialog;
-import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
-import me.hsgamer.hscore.config.Config;
-import org.bukkit.entity.Player;
+import java.util.Map;
+import java.util.Optional;
 
-public class ConfirmationDialogMenu extends DialogMenu {
-    public ConfirmationDialogMenu(Config config) {
-        super(config);
-    }
+public interface TextGetter {
+    Optional<Text> get(Map<String, Object> input, String... keys);
 
-    @Override
-    protected Dialog<?, ?, ?, ?> createDialogConstructor(Player player) {
-        return DialogManagerProvider.dialogManager().createConfirmationDialog();
-    }
+    Map<String, Text> getMap(Map<String, Object> input, String key);
 }

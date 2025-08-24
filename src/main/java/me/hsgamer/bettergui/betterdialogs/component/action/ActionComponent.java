@@ -15,12 +15,16 @@
 */
 package me.hsgamer.bettergui.betterdialogs.component.action;
 
+import io.github.projectunified.unidialog.adventure.action.AdventureDialogActionBuilder;
 import io.github.projectunified.unidialog.core.action.DialogActionBuilder;
 import io.github.projectunified.unidialog.core.dialog.*;
+import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
+import me.hsgamer.bettergui.betterdialogs.text.Text;
 import me.hsgamer.bettergui.util.StringReplacerApplier;
 import me.hsgamer.hscore.common.Validate;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,18 +32,16 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class ActionComponent extends DialogComponent {
-    private final String label;
-    private final @Nullable String tooltip;
+    private final Text label;
+    private final @Nullable Text tooltip;
     private final int width;
     private final @Nullable String assign;
 
     protected ActionComponent(DialogComponentBuilder.Input input) {
         super(input);
-        label = Optional.ofNullable(input.options().get("label"))
-                .map(Object::toString)
-                .orElse("Action");
-        tooltip = Optional.ofNullable(input.options().get("tooltip"))
-                .map(Object::toString)
+        label = DialogManagerProvider.textGetter().get(input.options(), "label")
+                .orElseGet(() -> Text.of("Action"));
+        tooltip = DialogManagerProvider.textGetter().get(input.options(), "tooltip")
                 .orElse(null);
         width = Optional.ofNullable(input.options().get("width"))
                 .map(Object::toString)
@@ -57,10 +59,24 @@ public abstract class ActionComponent extends DialogComponent {
     @Override
     public void apply(Player player, Dialog<?, ?, ?, ?> dialog) {
         Consumer<DialogActionBuilder<?, ?>> actionConsumer = builder -> {
-            builder
-                    .label(StringReplacerApplier.replace(label, player.getUniqueId(), this))
-                    .tooltip(tooltip == null ? null : StringReplacerApplier.replace(tooltip, player.getUniqueId(), this))
-                    .width(width);
+            builder.width(width);
+
+            String replacedLabel = StringReplacerApplier.replace(label.text(), player.getUniqueId(), this);
+            if (label.isAdventure() && builder instanceof AdventureDialogActionBuilder<?, ?> adventureBuilder) {
+                adventureBuilder.label((Component) label.parser().apply(replacedLabel, player));
+            } else {
+                builder.label(replacedLabel);
+            }
+
+            if (tooltip != null) {
+                String replacedTooltip = StringReplacerApplier.replace(tooltip.text(), player.getUniqueId(), this);
+                if (tooltip.isAdventure() && builder instanceof AdventureDialogActionBuilder<?, ?> adventureBuilder) {
+                    adventureBuilder.tooltip((Component) tooltip.parser().apply(replacedTooltip, player));
+                } else {
+                    builder.tooltip(replacedTooltip);
+                }
+            }
+
             getAction(player, builder);
         };
         switch (dialog) {
