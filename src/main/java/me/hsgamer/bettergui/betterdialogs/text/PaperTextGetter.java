@@ -15,9 +15,14 @@
 */
 package me.hsgamer.bettergui.betterdialogs.text;
 
+import io.github.miniplaceholders.api.MiniPlaceholders;
 import me.hsgamer.hscore.common.MapUtils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -26,12 +31,38 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PaperTextGetter implements TextGetter {
+    private static final boolean IS_MINI_PLACEHOLDERS_SUPPORTED;
+
+    static {
+        boolean isMiniPlaceholdersSupported = false;
+        if (Bukkit.getPluginManager().getPlugin("MiniPlaceholders") != null) {
+            try {
+                Class<?> clazz = Class.forName("io.github.miniplaceholders.api.MiniPlaceholders");
+                clazz.getDeclaredMethod("audienceGlobalPlaceholders");
+                Class<?> pointerClass = Class.forName("net.kyori.adventure.pointer.Pointered");
+                MiniMessage.class.getDeclaredMethod("deserialize", String.class, pointerClass, TagResolver.class);
+                isMiniPlaceholdersSupported = true;
+            } catch (Exception e) {
+                // IGNORE
+            }
+        }
+        IS_MINI_PLACEHOLDERS_SUPPORTED = isMiniPlaceholdersSupported;
+    }
+
+    public Component miniMessage(String input, Player player) {
+        if (IS_MINI_PLACEHOLDERS_SUPPORTED) {
+            TagResolver tagResolver = MiniPlaceholders.audienceGlobalPlaceholders();
+            return MiniMessage.miniMessage().deserialize(input, player, tagResolver);
+        }
+        return MiniMessage.miniMessage().deserialize(input);
+    }
+
     @Override
     public Optional<Text> get(Map<String, Object> input, String... keys) {
         String[] miniKeys = Arrays.stream(keys).flatMap(k -> Stream.of("mini-" + k, k + "$")).toArray(String[]::new);
         Optional<String> miniText = Optional.ofNullable(MapUtils.getIfFound(input, miniKeys)).map(Object::toString);
         if (miniText.isPresent()) {
-            return Optional.of(new Text(true, miniText.get(), (s, p) -> MiniMessage.miniMessage().deserialize(s)));
+            return Optional.of(new Text(true, miniText.get(), this::miniMessage));
         }
 
         String[] jsonKeys = Arrays.stream(keys).map(k -> "json-" + k).toArray(String[]::new);
@@ -51,7 +82,7 @@ public class PaperTextGetter implements TextGetter {
             return miniMap.entrySet().stream()
                     .filter(e -> e.getKey() instanceof String)
                     .filter(e -> e.getValue() != null)
-                    .map(e -> Map.entry((String) e.getKey(), new Text(true, e.getValue().toString(), (s, p) -> MiniMessage.miniMessage().deserialize(s))))
+                    .map(e -> Map.entry((String) e.getKey(), new Text(true, e.getValue().toString(), this::miniMessage)))
                     .collect(Collectors.toMap(
                             Map.Entry::getKey,
                             Map.Entry::getValue,
