@@ -18,6 +18,7 @@ package me.hsgamer.bettergui.betterdialogs.component.input;
 import io.github.projectunified.unidialog.adventure.input.AdventureSingleOptionInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
 import io.github.projectunified.unidialog.core.input.SingleOptionInput;
+import io.github.projectunified.unidialog.core.payload.DialogPayload;
 import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.text.Text;
@@ -92,7 +93,7 @@ public class SingleOptionInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String convertValue(UUID uuid, String rawValue) {
-        return rawValue;
+    protected String getValue(String key, DialogPayload payload) {
+        return payload.textValue(key);
     }
 }

@@ -17,6 +17,7 @@ package me.hsgamer.bettergui.betterdialogs.menu;
 
 import io.github.projectunified.unidialog.adventure.dialog.AdventureDialog;
 import io.github.projectunified.unidialog.core.dialog.Dialog;
+import io.github.projectunified.unidialog.core.payload.DialogPayload;
 import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
@@ -122,19 +123,19 @@ public abstract class DialogMenu extends BaseMenu {
         return dialog;
     }
 
-    private void applyInputs(UUID uuid, Map<String, String> map) {
+    private void applyInputs(DialogPayload payload) {
         for (DialogComponent component : componentMap.values()) {
             if (component instanceof InputComponent<?> inputComponent) {
-                inputComponent.applyValue(uuid, map);
+                inputComponent.applyValue(payload);
             }
         }
     }
 
     public String registerAction(String actionName, Consumer<UUID> action) {
         String id = getName() + "_" + actionName;
-        DialogManagerProvider.dialogManager().registerCustomAction(id, (uuid, map) -> {
-            applyInputs(uuid, map);
-            action.accept(uuid);
+        DialogManagerProvider.dialogManager().registerCustomAction(id, payload -> {
+            applyInputs(payload);
+            action.accept(payload.owner());
         });
         return id;
     }

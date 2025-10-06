@@ -18,6 +18,7 @@ package me.hsgamer.bettergui.betterdialogs.component.input;
 import io.github.projectunified.unidialog.adventure.input.AdventureNumberRangeInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
 import io.github.projectunified.unidialog.core.input.NumberRangeInput;
+import io.github.projectunified.unidialog.core.payload.DialogPayload;
 import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.text.Text;
@@ -113,7 +114,7 @@ public class NumberInputComponent extends InputComponent<Number> {
     }
 
     @Override
-    protected Number convertValue(UUID uuid, String rawValue) {
-        return Validate.getNumber(rawValue).orElse(null);
+    protected Number getValue(String key, DialogPayload payload) {
+        return payload.numberValue(key);
     }
 }

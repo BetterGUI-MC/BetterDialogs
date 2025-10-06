@@ -18,6 +18,7 @@ package me.hsgamer.bettergui.betterdialogs.component.input;
 import io.github.projectunified.unidialog.adventure.input.AdventureBooleanInput;
 import io.github.projectunified.unidialog.core.input.BooleanInput;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
+import io.github.projectunified.unidialog.core.payload.DialogPayload;
 import me.hsgamer.bettergui.betterdialogs.DialogManagerProvider;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.text.Text;
@@ -29,7 +30,7 @@ import org.bukkit.entity.Player;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BooleanInputComponent extends InputComponent<String> {
+public class BooleanInputComponent extends InputComponent<Boolean> {
     private final Text label;
     private final String initial;
     private final String onTrue;
@@ -67,25 +68,16 @@ public class BooleanInputComponent extends InputComponent<String> {
     }
 
     @Override
-    protected String getValue(String value, UUID uuid, String args) {
-        return value;
+    protected String getValue(Boolean value, UUID uuid, String args) {
+        if (value == Boolean.TRUE) {
+            return StringReplacerApplier.replace(onTrue, uuid, this);
+        } else {
+            return StringReplacerApplier.replace(onFalse, uuid, this);
+        }
     }
 
     @Override
-    protected String convertValue(UUID uuid, String rawValue) {
-        try {
-            float value = Float.parseFloat(rawValue);
-            rawValue = value == 0 ? "false" : "true";
-        } catch (NumberFormatException e) {
-            // Ignore the exception, keep the raw value as is
-        }
-
-        if (rawValue.equalsIgnoreCase("true") || rawValue.equalsIgnoreCase("yes")) {
-            return StringReplacerApplier.replace(onTrue, uuid, this);
-        } else if (rawValue.equalsIgnoreCase("false") || rawValue.equalsIgnoreCase("no")) {
-            return StringReplacerApplier.replace(onFalse, uuid, this);
-        } else {
-            return rawValue;
-        }
+    protected Boolean getValue(String key, DialogPayload payload) {
+        return payload.booleanValue(key);
     }
 }

@@ -17,6 +17,7 @@ package me.hsgamer.bettergui.betterdialogs.component.input;
 
 import io.github.projectunified.unidialog.core.dialog.Dialog;
 import io.github.projectunified.unidialog.core.input.DialogInputBuilder;
+import io.github.projectunified.unidialog.core.payload.DialogPayload;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.betterdialogs.component.DialogComponent;
 import org.bukkit.entity.Player;
@@ -43,7 +44,7 @@ public abstract class InputComponent<T> extends DialogComponent {
 
     protected abstract String getValue(T value, UUID uuid, String args);
 
-    protected abstract T convertValue(UUID uuid, String rawValue);
+    protected abstract T getValue(String key, DialogPayload payload);
 
     public String getValue(UUID uuid, String args) {
         T value = values.get(uuid);
@@ -53,16 +54,13 @@ public abstract class InputComponent<T> extends DialogComponent {
         return getValue(value, uuid, args);
     }
 
-    public void applyValue(UUID uuid, Map<String, String> map) {
-        String rawValue = map.get(key);
-        if (rawValue != null) {
-            T value = convertValue(uuid, rawValue);
-            if (value != null) {
-                values.put(uuid, value);
-                return;
-            }
+    public void applyValue(DialogPayload payload) {
+        T value = getValue(key, payload);
+        if (value == null) {
+            values.remove(payload.owner());
+        } else {
+            values.put(payload.owner(), value);
         }
-        values.remove(uuid);
     }
 
     @Override
