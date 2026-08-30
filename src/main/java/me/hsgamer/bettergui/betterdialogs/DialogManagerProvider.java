@@ -98,7 +98,7 @@ public class DialogManagerProvider {
         return itemConsumer;
     }
 
-    private enum DialogManagerType {
+    public enum DialogManagerType {
         PAPER(
                 () -> Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7),
                 plugin -> new PaperDialogManager(plugin, "betterdialogs"),

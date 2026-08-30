@@ -23,7 +23,9 @@ import me.hsgamer.bettergui.betterdialogs.menu.ConfirmationDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.MultiActionDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.NoticeDialogMenu;
 import me.hsgamer.bettergui.betterdialogs.menu.ServerLinksDialogMenu;
+import me.hsgamer.bettergui.betterdialogs.requirement.DialogSupportRequirement;
 import me.hsgamer.bettergui.builder.MenuBuilder;
+import me.hsgamer.bettergui.builder.RequirementBuilder;
 import me.hsgamer.bettergui.util.SchedulerUtil;
 import me.hsgamer.hscore.bukkit.config.BukkitConfig;
 import me.hsgamer.hscore.config.proxy.ConfigGenerator;
@@ -57,6 +59,9 @@ public final class BetterDialogs implements Expansion, GetLogger, GetPlugin, Rel
         MenuBuilder.INSTANCE.register(MultiActionDialogMenu::new, "multi-action-dialog", "action-dialog");
         MenuBuilder.INSTANCE.register(NoticeDialogMenu::new, "notice-dialog");
         MenuBuilder.INSTANCE.register(ServerLinksDialogMenu::new, "server-links-dialog", "links-dialog", "server-link-dialog", "link-dialog");
+        if (DialogManagerProvider.DialogManagerType.VIAVERSION.isAvailable()) {
+            RequirementBuilder.INSTANCE.register(DialogSupportRequirement::new, "dialog-support", "support-dialog");
+        }
     }
 
     @Override
