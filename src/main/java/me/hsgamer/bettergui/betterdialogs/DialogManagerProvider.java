@@ -20,6 +20,7 @@ import io.github.projectunified.unidialog.core.DialogManager;
 import io.github.projectunified.unidialog.packetevents.PocketEventsDialogManager;
 import io.github.projectunified.unidialog.paper.PaperDialogManager;
 import io.github.projectunified.unidialog.spigot.SpigotDialogManager;
+import io.github.projectunified.unidialog.viaversion.ViaVersionDialogManager;
 import me.hsgamer.bettergui.betterdialogs.text.PacketEventsTextGetter;
 import me.hsgamer.bettergui.betterdialogs.text.PaperTextGetter;
 import me.hsgamer.bettergui.betterdialogs.text.SpigotTextGetter;
@@ -103,6 +104,11 @@ public class DialogManagerProvider {
                     }
                 },
                 PacketEventsTextGetter::new
+        ),
+        VIAVERSION(
+                () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null,
+                plugin -> new ViaVersionDialogManager("betterdialogs"),
+                SpigotTextGetter::new
         ),
         SPIGOT(
                 () -> Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog"),

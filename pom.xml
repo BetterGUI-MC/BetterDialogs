@@ -19,7 +19,7 @@
 
     <properties>
         <core.version>4.5.7</core.version>
-        <unidialog.version>1.5.0</unidialog.version>
+        <unidialog.version>1.6.0</unidialog.version>
         <java.version>21</java.version>
         <project.mainClass>me.hsgamer.bettergui.betterdialogs.BetterDialogs</project.mainClass>
         <license.packageName>me.hsgamer.bettergui.betterdialogs.license</license.packageName>
@@ -33,6 +33,10 @@
         <repository>
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
+        </repository>
+        <repository>
+            <id>viaversion</id>
+            <url>https://repo.viaversion.com</url>
         </repository>
     </repositories>
 
@@ -125,6 +129,16 @@
         </dependency>
         <dependency>
             <groupId>io.github.projectunified</groupId>
+            <artifactId>uni-dialog-viaversion</artifactId>
+            <version>${unidialog.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
+            <artifactId>uni-dialog-viaversion-spigot</artifactId>
+            <version>${unidialog.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.projectunified</groupId>
             <artifactId>uni-dialog-paper</artifactId>
             <version>${unidialog.version}</version>
         </dependency>
@@ -137,6 +151,12 @@
             <groupId>com.github.retrooper</groupId>
             <artifactId>packetevents-spigot</artifactId>
             <version>2.9.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.viaversion</groupId>
+            <artifactId>viaversion-api</artifactId>
+            <version>5.11.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

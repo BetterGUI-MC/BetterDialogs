@@ -20,6 +20,8 @@ import io.github.projectunified.unidialog.core.body.DialogBodyBuilder;
 import io.github.projectunified.unidialog.core.body.ItemBody;
 import io.github.projectunified.unidialog.packetevents.body.PEItemBody;
 import io.github.projectunified.unidialog.paper.body.PaperItemBody;
+import io.github.projectunified.unidialog.viaversion.body.ViaItemBody;
+import io.github.projectunified.unidialog.viaversion.spigot.ViaItemUtil;
 import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import me.hsgamer.bettergui.betterdialogs.builder.DialogComponentBuilder;
 import me.hsgamer.bettergui.builder.ItemModifierBuilder;
@@ -89,6 +91,8 @@ public class ItemComponent extends DialogBodyComponent {
             paperItemBody.item(itemStack);
         } else if (itemBody instanceof BungeeItemBody spigotItemBody) {
             spigotItemBody.item(itemStack);
+        } else if (itemBody instanceof ViaItemBody viaItemBody) {
+            viaItemBody.item(ViaItemUtil.fromItemStack(itemStack));
         }
     }
 }
