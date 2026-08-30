@@ -129,7 +129,7 @@ public class DialogManagerProvider {
                 (itemStack, itemBody) -> ((BungeeItemBody) itemBody).item(itemStack)
         ),
         VIAVERSION(
-                () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null,
+                () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null && VersionUtils.isLowerThan(21, 6),
                 plugin -> new ViaVersionDialogManager("betterdialogs"),
                 SpigotTextGetter::new,
                 (itemStack, itemBody) -> ((ViaItemBody) itemBody).item(ViaItemUtil.fromItemStack(itemStack))
