@@ -16,11 +16,18 @@
 package me.hsgamer.bettergui.betterdialogs;
 
 import io.github.projectunified.minelib.scheduler.common.util.Platform;
+import io.github.projectunified.unidialog.bungeecord.body.BungeeItemBody;
 import io.github.projectunified.unidialog.core.DialogManager;
+import io.github.projectunified.unidialog.core.body.ItemBody;
 import io.github.projectunified.unidialog.packetevents.PocketEventsDialogManager;
+import io.github.projectunified.unidialog.packetevents.body.PEItemBody;
 import io.github.projectunified.unidialog.paper.PaperDialogManager;
+import io.github.projectunified.unidialog.paper.body.PaperItemBody;
 import io.github.projectunified.unidialog.spigot.SpigotDialogManager;
 import io.github.projectunified.unidialog.viaversion.ViaVersionDialogManager;
+import io.github.projectunified.unidialog.viaversion.body.ViaItemBody;
+import io.github.projectunified.unidialog.viaversion.spigot.ViaItemUtil;
+import io.github.retrooper.packetevents.util.SpigotReflectionUtil;
 import me.hsgamer.bettergui.betterdialogs.text.PacketEventsTextGetter;
 import me.hsgamer.bettergui.betterdialogs.text.PaperTextGetter;
 import me.hsgamer.bettergui.betterdialogs.text.SpigotTextGetter;
@@ -31,10 +38,12 @@ import me.hsgamer.hscore.logger.common.LogLevel;
 import me.hsgamer.hscore.logger.common.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,6 +51,7 @@ import java.util.function.Supplier;
 public class DialogManagerProvider {
     private static DialogManager<?, ?, ?, ?, ?> dialogManager;
     private static TextGetter textGetter;
+    private static BiConsumer<ItemStack, ItemBody<?, ?, ?>> itemConsumer;
 
     public static boolean init(String name, Plugin plugin, Logger logger) {
         DialogManagerType dialogManagerType = null;
@@ -72,6 +82,7 @@ public class DialogManagerProvider {
         logger.log(LogLevel.INFO, "Using " + dialogManagerType.name() + " for BetterDialogs");
         dialogManager = dialogManagerType.constructor.apply(plugin);
         textGetter = dialogManagerType.textGetterSupplier.get();
+        itemConsumer = dialogManagerType.itemConsumer;
         return true;
     }
 
@@ -83,11 +94,16 @@ public class DialogManagerProvider {
         return textGetter;
     }
 
+    public static BiConsumer<ItemStack, ItemBody<?, ?, ?>> itemConsumer() {
+        return itemConsumer;
+    }
+
     private enum DialogManagerType {
         PAPER(
                 () -> Platform.PAPER.isPlatform() && VersionUtils.isAtLeast(21, 7),
                 plugin -> new PaperDialogManager(plugin, "betterdialogs"),
-                PaperTextGetter::new
+                PaperTextGetter::new,
+                (itemStack, itemBody) -> ((PaperItemBody) itemBody).item(itemStack)
         ),
         PACKETEVENTS(
                 () -> Bukkit.getPluginManager().getPlugin("packetevents") != null,
@@ -103,27 +119,32 @@ public class DialogManagerProvider {
                         return p.getUniqueId();
                     }
                 },
-                PacketEventsTextGetter::new
+                PacketEventsTextGetter::new,
+                (itemStack, itemBody) -> ((PEItemBody) itemBody).item(SpigotReflectionUtil.decodeBukkitItemStack(itemStack))
         ),
         VIAVERSION(
                 () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null,
                 plugin -> new ViaVersionDialogManager("betterdialogs"),
-                SpigotTextGetter::new
+                SpigotTextGetter::new,
+                (itemStack, itemBody) -> ((ViaItemBody) itemBody).item(ViaItemUtil.fromItemStack(itemStack))
         ),
         SPIGOT(
                 () -> Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog"),
                 plugin -> new SpigotDialogManager(plugin, "betterdialogs"),
-                SpigotTextGetter::new
+                SpigotTextGetter::new,
+                (itemStack, itemBody) -> ((BungeeItemBody) itemBody).item(itemStack)
         );
 
         private final BooleanSupplier isAvailable;
         private final Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor;
         private final Supplier<TextGetter> textGetterSupplier;
+        private final BiConsumer<ItemStack, ItemBody<?, ?, ?>> itemConsumer;
 
-        DialogManagerType(BooleanSupplier isAvailable, Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor, Supplier<TextGetter> textGetterSupplier) {
+        DialogManagerType(BooleanSupplier isAvailable, Function<Plugin, DialogManager<?, ?, ?, ?, ?>> constructor, Supplier<TextGetter> textGetterSupplier, BiConsumer<ItemStack, ItemBody<?, ?, ?>> itemConsumer) {
             this.isAvailable = isAvailable;
             this.constructor = constructor;
             this.textGetterSupplier = textGetterSupplier;
+            this.itemConsumer = itemConsumer;
         }
 
         public boolean isAvailable() {
