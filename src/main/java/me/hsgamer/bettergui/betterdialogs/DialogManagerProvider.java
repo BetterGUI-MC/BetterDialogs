@@ -106,7 +106,7 @@ public class DialogManagerProvider {
                 (itemStack, itemBody) -> ((PaperItemBody) itemBody).item(itemStack)
         ),
         PACKETEVENTS(
-                () -> Bukkit.getPluginManager().getPlugin("packetevents") != null,
+                () -> Bukkit.getPluginManager().getPlugin("packetevents") != null && VersionUtils.isAtLeast(21, 6),
                 plugin -> new PocketEventsDialogManager("betterdialogs") {
                     @Override
                     protected @Nullable Player getPlayer(UUID uuid) {
@@ -122,17 +122,17 @@ public class DialogManagerProvider {
                 PacketEventsTextGetter::new,
                 (itemStack, itemBody) -> ((PEItemBody) itemBody).item(SpigotReflectionUtil.decodeBukkitItemStack(itemStack))
         ),
-        VIAVERSION(
-                () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null,
-                plugin -> new ViaVersionDialogManager("betterdialogs"),
-                SpigotTextGetter::new,
-                (itemStack, itemBody) -> ((ViaItemBody) itemBody).item(ViaItemUtil.fromItemStack(itemStack))
-        ),
         SPIGOT(
                 () -> Validate.isClassLoaded("net.md_5.bungee.api.dialog.Dialog"),
                 plugin -> new SpigotDialogManager(plugin, "betterdialogs"),
                 SpigotTextGetter::new,
                 (itemStack, itemBody) -> ((BungeeItemBody) itemBody).item(itemStack)
+        ),
+        VIAVERSION(
+                () -> Bukkit.getPluginManager().getPlugin("ViaVersion") != null,
+                plugin -> new ViaVersionDialogManager("betterdialogs"),
+                SpigotTextGetter::new,
+                (itemStack, itemBody) -> ((ViaItemBody) itemBody).item(ViaItemUtil.fromItemStack(itemStack))
         );
 
         private final BooleanSupplier isAvailable;
